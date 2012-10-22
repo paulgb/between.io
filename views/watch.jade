@@ -21,8 +21,8 @@ block content
           td= request.status
           td= request.method
           td= request.path
-          td= request.headers['content-type']
-          td= request.headers['content-length']
+          td= request.res_headers['content-type']
+          td= request.res_headers['content-length']
           td
             a(href='/request/#{request.id}') view
 

@@ -6,7 +6,7 @@ block content
   div(class='row')
     table(class='table table-bordered span4')
       tr
-        th Host
+        th(style='width: 130px;') Host
         td #{request.host}
       tr
         th Path
@@ -17,13 +17,21 @@ block content
       tr
         th Port
         td #{request.port}
+  table(class='table table-bordered')
+    tr
+      th Header
+      th Value
+    for val, header in request.req_headers
+      tr
+        td(style='width: 130px')= header
+        td= val
   h2 response
   p Code: #{request.status}
   table(class='table table-bordered')
     tr
       th Header
       th Value
-    for val, header in request.headers
+    for val, header in request.res_headers
       tr
         td(style='width: 130px')= header
         td= val

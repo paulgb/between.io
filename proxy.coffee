@@ -18,8 +18,9 @@ module.exports = (app, sharedState) ->
     port = 80
     path = req.url
     method = req.method
+    req_headers = req.headers
     
-    request = {host, port, path, method, headers: {}}
+    request = {host, port, path, method, req_headers, res_headers: {}}
     request.id = sharedState.requests.add(request)
 
     sharedState.streams[streamId].unshift(request)
@@ -33,7 +34,7 @@ module.exports = (app, sharedState) ->
         reasonPhrase = undefined
 
       request.status = statusCode
-      request.headers = headers
+      request.res_headers = headers
 
     req.headers.host = host
     proxy.proxyRequest req, res, {host, port}
