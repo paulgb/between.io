@@ -1,0 +1,30 @@
+extends layout
+
+block content
+  h2 request
+  p #{request.method} #{request.host}#{request.path}
+  div(class='row')
+    table(class='table table-bordered span4')
+      tr
+        th Host
+        td #{request.host}
+      tr
+        th Path
+        td #{request.path}
+      tr
+        th Method
+        td #{request.method}
+      tr
+        th Port
+        td #{request.port}
+  h2 response
+  p Code: #{request.status}
+  table(class='table table-bordered')
+    tr
+      th Header
+      th Value
+    for val, header in request.headers
+      tr
+        td(style='width: 130px')= header
+        td= val
+

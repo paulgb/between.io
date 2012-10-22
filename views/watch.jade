@@ -1,0 +1,28 @@
+extends layout
+
+block content
+  h1 watch
+  p Short URL: 
+    a(href=shortURL)= shortURL
+  p Host: 
+    a(href='http://#{host}')= host
+  table(class='table table-striped table-bordered table-condensed')
+    thead
+      tr
+        th(style='width: 40px;') Status
+        th(style='width: 40px;') Method
+        th Path
+        th(style='width: 170px;') Content Type
+        th(style='width: 120px;') Content Length
+        th(style='width: 80;') View
+    tbody
+      each request in stream
+        tr
+          td= request.status
+          td= request.method
+          td= request.path
+          td= request.headers['content-type']
+          td= request.headers['content-length']
+          td
+            a(href='/request/#{request.id}') view
+

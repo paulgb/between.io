@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  h1 between
+  p
+    | Enter the 
+    strong hostname 
+    | of an API server to get started
+  form(method='POST', action='/new')
+    div(class='input-append')
+      input(class='span7', size=16, type='text', placeholder='graph.facebook.com', name='host')
+      input(class='btn span1', size=16, type='submit', value='go')
+
