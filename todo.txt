@@ -1,0 +1,7 @@
+
+- don't render non-text content-types
+- horizontal scroll for pre
+- preserve case for headers
+- POST content
+
+
