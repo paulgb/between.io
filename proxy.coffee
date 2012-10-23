@@ -28,15 +28,20 @@ module.exports = (app, sharedState) ->
 
     res.oldEnd = res.end
     res.end = ->
-      console.log "end #{request.len}"
       res.oldEnd()
       data = new Buffer(request.len)
       i = 0
       for chunk in request.parts
         chunk.copy data, i, 0, chunk.length
+        i += chunk.length
       if request.res_headers['content-encoding'] == 'gzip'
-        zlib.gunzip data, (error, data) ->
-          request.data = data
+        request.res_headers['compressed-size'] = data.length
+        request.res_headers['chunks'] = request.parts.length
+        zlib.gunzip data, (err, data) ->
+          if err
+            request.data = err
+          else
+            request.data = data
       else
         request.data = data
 
