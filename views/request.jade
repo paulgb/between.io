@@ -25,6 +25,7 @@ block content
       tr
         td(style='width: 130px')= header
         td= val
+  pre= request.postdata
   h2 response
   p Code: #{request.status}
   table(class='table table-bordered')
@@ -35,7 +36,5 @@ block content
       tr
         td(style='width: 130px')= header
         td= val
-  if request.data
-    p length of data: #{request.data.length}
   pre= request.data
 

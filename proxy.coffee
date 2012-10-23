@@ -28,7 +28,7 @@ module.exports = (app, sharedState) ->
     method = req.method
     req.headers = caseHeaders(req.headers)
     
-    request = {host, port, path, method, req_headers: req.headers, res_headers: {}, parts: [], len:0, data:''}
+    request = {host, port, path, method, req_headers: req.headers, res_headers: {}, parts: [], len:0, data:'', postdata:''}
     request.id = sharedState.requests.add(request)
 
     sharedState.streams[streamId].unshift(request)
@@ -66,7 +66,11 @@ module.exports = (app, sharedState) ->
       request.status = statusCode
       request.res_headers = headers
 
+    req.on 'data', (data) ->
+      request.postdata += data
+
     req.headers.Host = host
+    console.log "Sending request to proxy #{host}, #{req.url}"
     proxy.proxyRequest req, res, {host, port}
 
   proxy.listen 80, ->
