@@ -13,15 +13,22 @@ module.exports = (app, sharedState) ->
     result = hregex.exec(host)
     result[1]
 
+  caseHeaders = (headers) ->
+    newHeaders = {}
+    for header, value of headers
+      header = header.replace /(^|-)\w/g, (a) -> a.toUpperCase()
+      newHeaders[header] = value
+    return newHeaders
+
   proxy = httpProxy.createServer (req, res, proxy) ->
     streamId = getStreamFromHost(req.headers.host)
     host = getHost(streamId)
     port = 80
     path = req.url
     method = req.method
-    req_headers = req.headers
+    req.headers = caseHeaders(req.headers)
     
-    request = {host, port, path, method, req_headers, res_headers: {}, parts: [], len:0, data:''}
+    request = {host, port, path, method, req_headers: req.headers, res_headers: {}, parts: [], len:0, data:''}
     request.id = sharedState.requests.add(request)
 
     sharedState.streams[streamId].unshift(request)
@@ -53,17 +60,13 @@ module.exports = (app, sharedState) ->
       request.len += chunk.length
 
     res.oldWriteHead = res.writeHead
-    res.writeHead = (statusCode, reasonPhrase, headers) =>
-      res.oldWriteHead statusCode, reasonPhrase, headers
-
-      if typeof(reasonPhrase == 'object')
-        headers = reasonPhrase
-        reasonPhrase = undefined
+    res.writeHead = (statusCode, headers) =>
+      res.oldWriteHead statusCode, headers
 
       request.status = statusCode
       request.res_headers = headers
 
-    req.headers.host = host
+    req.headers.Host = host
     proxy.proxyRequest req, res, {host, port}
 
   proxy.listen 80, ->
