@@ -10,6 +10,7 @@
     "jade": "*",
     "less-middleware": "*",
     "coffee-script": "*",
-    "http-proxy": "*"
+    "http-proxy": "*",
+    "highlight.js": "*"
   }
 }
