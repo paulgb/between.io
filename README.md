@@ -39,7 +39,3 @@ If you are using a third-party or vendor-provided library for accessing the API,
 
 The interceptor instructions above describe intercepting outgoing communication with a remote server, but it can just as easily be used to interact with incoming communication. Simply create an interceptor with the hostname of your server. The interceptor subdomain can be given to a remote server where you would otherwise provide your hostname. For example, this could be used to debug webhooks.
 
-### HTTP Proxy
-
-
-
