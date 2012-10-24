@@ -6,7 +6,7 @@ block content
   div(class='row')
     table(class='table table-bordered span4')
       tr
-        th(style='width: 130px;') Host
+        th(style='width: 180px;') Host
         td #{exchange.host}
       tr
         th Path
@@ -23,7 +23,7 @@ block content
       th Value
     for val, header in exchange.requestHeaders
       tr
-        td(style='width: 130px')= header
+        td(style='width: 180px')= header
         td= val
   p= exchange.requestData.status
   if exchange.requestData.status == 'done'
@@ -37,7 +37,7 @@ block content
       th Value
     for val, header in exchange.responseHeaders
       tr
-        td(style='width: 130px')= header
+        td(style='width: 180px')= header
         td= val
   p= exchange.responseData.status
   if exchange.responseData.status == 'done'

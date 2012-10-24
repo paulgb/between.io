@@ -28,21 +28,20 @@ class DownloadRenderer
 
   renderTemplate: jade.compile(
     '''
-    div(class='row')
-      table(class='table span2 table-bordered')
-        tr
-          th Type
-          td= file.contentType
-        tr
-          th Size
-          td= filesize(file.data.length)
-        tr
-          th Raw Size
-          td= filesize(file.rawData.length)
-        tr
-          th Download
-          td
-            a(href='#') Download
+    table(class='table table-bordered')
+      tr
+        th(style='width: 180px;') Type
+        td= file.contentType
+      tr
+        th Size
+        td= filesize(file.data.length)
+      tr
+        th Raw Size
+        td= filesize(file.rawData.length)
+      tr
+        th Download
+        td
+          a(href='#') Download
     ''')
 
   render: (file) ->
