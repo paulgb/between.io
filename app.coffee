@@ -1,6 +1,7 @@
 
 jade = require('jade')
 filesize = require('filesize')
+highlight = require('highlight.js')
 
 class RawRenderer
   canRender: (contentType) ->
@@ -10,6 +11,16 @@ class RawRenderer
   
   render: (file) ->
     @renderTemplate({data: file.data})
+
+class SyntaxRenderer
+  canRender: (contentType) ->
+    return true
+
+  renderTemplate: jade.compile('pre!= data')
+  
+  render: (file) ->
+    highlighted = highlight.highlightAuto(file.data.toString('ascii'))
+    @renderTemplate({data: highlighted.value})
 
 class DownloadRenderer
   canRender: (contentType) ->
@@ -42,6 +53,7 @@ class RenderManager
     @renderers = [
       new RawRenderer()
       new DownloadRenderer()
+      new SyntaxRenderer()
     ]
 
   render: (file) =>
