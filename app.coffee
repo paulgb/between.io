@@ -1,4 +1,58 @@
 
+jade = require('jade')
+filesize = require('filesize')
+
+class RawRenderer
+  canRender: (contentType) ->
+    return true
+
+  renderTemplate: jade.compile('pre= data')
+  
+  render: (file) ->
+    @renderTemplate({data: file.data})
+
+class DownloadRenderer
+  canRender: (contentType) ->
+    return true
+
+  renderTemplate: jade.compile(
+    '''
+    div(class='row')
+      table(class='table span2 table-bordered')
+        tr
+          th Type
+          td= file.contentType
+        tr
+          th Size
+          td= filesize(file.data.length)
+        tr
+          th Raw Size
+          td= filesize(file.rawData.length)
+        tr
+          th Download
+          td
+            a(href='#') Download
+    ''')
+
+  render: (file) ->
+    @renderTemplate({file: file, filesize})
+
+class RenderManager
+  constructor: ->
+    @renderers = [
+      new RawRenderer()
+      new DownloadRenderer()
+    ]
+
+  render: (file) =>
+    if file.data.length == 0
+      return []
+    renders = []
+    for renderer in @renderers
+      if renderer.canRender(file.contentType)
+        renders.push renderer.render(file)
+    return renders
+
 class StorageCollection
   constructor: ->
     @radix = 36
@@ -17,7 +71,7 @@ module.exports = (app, sharedState) ->
   sharedState.streamAutoIncr = 3214
   sharedState.hostMap = {'2ha': 'bitaesthetics.com'}
   sharedState.streams = {'2ha': []}
-  sharedState.requests = new StorageCollection()
+  sharedState.exchanges = new StorageCollection()
 
   app.get '/', (req, res) ->
     res.render 'index', {}
@@ -36,7 +90,8 @@ module.exports = (app, sharedState) ->
     stream = sharedState.streams[streamId]
     res.render 'watch', {streamId, shortURL, host, stream}
 
-  app.get '/request/:id', (req, res) ->
-    request = sharedState.requests.get req.params.id
-    res.render 'request', {request}
+  app.get '/exchange/:id', (req, res) ->
+    exchange = sharedState.exchanges.get req.params.id
+    renderer = new RenderManager()
+    res.render 'exchange', {exchange, renderer: renderer.render}
 

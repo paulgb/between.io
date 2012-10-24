@@ -16,13 +16,14 @@ block content
         th(style='width: 120px;') Content Length
         th(style='width: 80;') View
     tbody
-      each request in stream
+      each exchange in stream
         tr
-          td= request.status
-          td= request.method
-          td= request.path
-          td= request.res_headers['content-type']
-          td= request.res_headers['content-length']
+          td= exchange.responseData.status
+          td= exchange.responseStatus
+          td= exchange.method
+          td= exchange.path
+          td= exchange.responseHeaders['content-type']
+          td= exchange.responseHeaders['content-length']
           td
-            a(href='/request/#{request.id}') view
+            a(href='/exchange/#{exchange.id}') view
 

@@ -11,6 +11,7 @@
     "less-middleware": "*",
     "coffee-script": "*",
     "http-proxy": "*",
-    "highlight.js": "*"
+    "highlight.js": "*",
+    "filesize": "*"
   }
 }
