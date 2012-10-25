@@ -14,11 +14,10 @@ block content
         th Path
         th(style='width: 170px;') Content Type
         th(style='width: 120px;') Content Length
-        th(style='width: 80;') View
+        th(style='width: 80px;') View
     tbody
       each exchange in stream
         tr
-          td= exchange.responseData.status
           td= exchange.responseStatus
           td= exchange.method
           td= exchange.path

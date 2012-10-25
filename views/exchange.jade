@@ -1,6 +1,8 @@
 extends layout
 
 block content
+  p
+    a(class='btn', href='/watch/#{exchange.stream}') Back
   h2 exchange
   p #{exchange.method} #{exchange.host}#{exchange.path}
   div(class='row')

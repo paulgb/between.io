@@ -65,6 +65,7 @@ module.exports = (app, sharedState) ->
     streamId = getStreamFromHost(req.headers.host)
 
     exchange =
+      stream: streamId
       host: getHost(streamId)
       port: 80
       path: req.url
