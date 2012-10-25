@@ -25,6 +25,8 @@ class StreamingFile
     if @contentLength? and @lenProcessed.toString() != @contentLength
       @status = 'error'
       @err("Bad content length (expected #{@contentLength} bytes, got #{@lenProcessed})")
+    else if @lenProcessed == 0
+      @status = 'no data'
     else
       @rawData = new Buffer(@lenProcessed)
       i = 0
@@ -92,7 +94,8 @@ module.exports = (app, sharedState) ->
       res.oldWriteHead statusCode, headers
 
       exchange.responseStatus = statusCode
-      exchange.responseHeaders = headers
+      exchange.responsePhrase = http.STATUS_CODES[statusCode]
+      exchange.responseHeaders = caseHeaders(headers)
       exchange.responseData = streamingFileFromHeaders(headers)
 
     req.on 'data', exchange.requestData.pushData

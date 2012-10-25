@@ -99,7 +99,7 @@ module.exports = (app, sharedState) ->
     shortURL = "http://#{streamId}.#{app.get('proxy host')}"
     host = sharedState.hostMap[streamId]
     stream = sharedState.streams[streamId]
-    res.render 'watch', {streamId, shortURL, host, stream}
+    res.render 'watch', {streamId, shortURL, host, stream, filesize}
 
   app.get '/exchange/:id', (req, res) ->
     exchange = sharedState.exchanges.get req.params.id

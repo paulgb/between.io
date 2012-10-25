@@ -1,48 +1,37 @@
 extends layout
 
 block content
-  p
-    a(class='btn', href='/watch/#{exchange.stream}') Back
-  h2 exchange
-  p #{exchange.method} #{exchange.host}#{exchange.path}
   div(class='row')
-    table(class='table table-bordered span4')
-      tr
-        th(style='width: 180px;') Host
-        td #{exchange.host}
-      tr
-        th Path
-        td #{exchange.path}
-      tr
-        th Method
-        td #{exchange.method}
-      tr
-        th Port
-        td #{exchange.port}
-  table(class='table table-bordered')
-    tr
-      th Header
-      th Value
-    for val, header in exchange.requestHeaders
-      tr
-        td(style='width: 180px')= header
-        td= val
-  p= exchange.requestData.status
+    div(class='span6')
+      h1= exchange.method
+      p(style='color: #333')
+        span http://
+        span(style='color: #999')= exchange.host
+        span= exchange.path
+      h3 Headers
+      table(class='table table-headers')
+        for val, header in exchange.requestHeaders
+          tr
+            th= header
+            td
+              tt= val
+
+    div(class='span6')
+      h1 #{exchange.responseStatus} #{exchange.responsePhrase}
+      h3 Headers
+      table(class='table table-headers')
+        for val, header in exchange.responseHeaders
+          tr
+            th= header
+            td
+              tt= val
+
   if exchange.requestData.status == 'done'
+    h3 Request Data
     for render in renderer(exchange.requestData)
       != render
-  h2 response
-  p Code: #{exchange.responseStatus}
-  table(class='table table-bordered')
-    tr
-      th Header
-      th Value
-    for val, header in exchange.responseHeaders
-      tr
-        td(style='width: 180px')= header
-        td= val
-  p= exchange.responseData.status
+
   if exchange.responseData.status == 'done'
+    h3 Response Data
     for render in renderer(exchange.responseData)
       != render
-
