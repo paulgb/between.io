@@ -3,16 +3,23 @@ jade = require('jade')
 filesize = require('filesize')
 highlight = require('highlight.js')
 
-class RawRenderer
+class Renderer
+  render: (file) ->
+    @renderTemplate({file: file, data: file.data})
+
+  get: (file) ->
+    name: @name
+    content: @render(file)
+
+class RawRenderer extends Renderer
+  name: 'plaintext'
   canRender: (contentType) ->
     return true
 
   renderTemplate: jade.compile('pre= data')
-  
-  render: (file) ->
-    @renderTemplate({data: file.data})
 
-class SyntaxRenderer
+class SyntaxRenderer extends Renderer
+  name: 'syntax'
   canRender: (contentType) ->
     return true
 
@@ -22,7 +29,8 @@ class SyntaxRenderer
     highlighted = highlight.highlightAuto(file.data.toString('ascii'))
     @renderTemplate({data: highlighted.value})
 
-class DownloadRenderer
+class DownloadRenderer extends Renderer
+  name: 'info'
   canRender: (contentType) ->
     return true
 
@@ -61,7 +69,9 @@ class RenderManager
     renders = []
     for renderer in @renderers
       if renderer.canRender(file.contentType)
-        renders.push renderer.render(file)
+        console.log "#{renderer.name} #{file.contentType}"
+        renders.push renderer.get(file)
+        console.log 'done'
     return renders
 
 class StorageCollection

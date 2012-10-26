@@ -2,4 +2,5 @@
 - don't render non-text content-types
 - horizontal scroll for pre
 - real-time
+- tabbed content renderings
 

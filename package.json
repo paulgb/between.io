@@ -12,6 +12,6 @@
     "coffee-script": "*",
     "http-proxy": "*",
     "highlight.js": "*",
-    "filesize": "*"
+    "filesize": "*",
   }
 }

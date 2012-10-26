@@ -1,5 +1,19 @@
 extends layout
 
+mixin content(part, name, content)
+  - var rendered = renderer(content)
+  if content.status == 'done'
+    h3= name
+    ul(class='nav nav-pills', id='#{part}Content')
+      each render, i in rendered
+        li(class=(i==0? 'active' : ''))
+          a(href='##{render.name}', data-toggle='tab')= render.name
+    div(class='tab-content')
+      each render, i in rendered
+        div(class='tab-pane#{i==0 ? ' active' : ''}', id='#{render.name}')
+          != render.content
+  
+
 block content
   div(class='row')
     div(class='span6')
@@ -26,12 +40,6 @@ block content
             td
               tt= val
 
-  if exchange.requestData.status == 'done'
-    h3 Request Data
-    for render in renderer(exchange.requestData)
-      != render
+  mixin content('response', 'Response Data', exchange.responseData)
 
-  if exchange.responseData.status == 'done'
-    h3 Response Data
-    for render in renderer(exchange.responseData)
-      != render
+
