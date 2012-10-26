@@ -11,17 +11,47 @@ class Renderer
     name: @name
     content: @render(file)
 
+  canRender: (contentType) ->
+    console.log @contentTypes
+    for typeMatch in @contentTypes
+      if typeof(typeMatch) == 'string'
+        if contentType == typeMatch
+          return true
+      else if typeMatch.test(contentType)
+        return true
+    return false
+
 class RawRenderer extends Renderer
   name: 'plaintext'
-  canRender: (contentType) ->
-    return true
-
+  contentTypes: [
+    /^text/
+    /^application\/(x-)?javascript/
+    /^image\/svg\+xml/
+    /^application\/xml/
+    /^application\/json/
+  ]
   renderTemplate: jade.compile('pre= data')
 
 class SyntaxRenderer extends Renderer
   name: 'syntax'
-  canRender: (contentType) ->
-    return true
+
+  typeMappings =
+    'application/x-ruby': 'ruby'
+    'application/x-python': 'python'
+    'application/json': 'json'
+    'text/css': 'css'
+    'application/xml': 'xml'
+    'text/html': 'xml'
+    'image/svg+xml': 'xml'
+    'text/x-haskell': 'haskell'
+    'text/x-perl': 'perl'
+    'application/x-httpd-php': 'php'
+    'text/javascript': 'javascript'
+    'application/javascript': 'javascript'
+    'application/x-javascript': 'javascript'
+
+  typeMappings: typeMappings
+  contentTypes: (type for type of typeMappings)
 
   renderTemplate: jade.compile('pre!= data')
   
@@ -31,8 +61,10 @@ class SyntaxRenderer extends Renderer
 
 class DownloadRenderer extends Renderer
   name: 'info'
-  canRender: (contentType) ->
-    return true
+
+  contentTypes: [
+    /./
+  ]
 
   renderTemplate: jade.compile(
     '''
@@ -58,20 +90,20 @@ class DownloadRenderer extends Renderer
 class RenderManager
   constructor: ->
     @renderers = [
+      new SyntaxRenderer()
       new RawRenderer()
       new DownloadRenderer()
-      new SyntaxRenderer()
     ]
 
   render: (file) =>
-    if file.data.length == 0
+    if file.data?.length == 0
       return []
     renders = []
     for renderer in @renderers
       if renderer.canRender(file.contentType)
-        console.log "#{renderer.name} #{file.contentType}"
+        #console.log "#{renderer.name} #{file.contentType}"
         renders.push renderer.get(file)
-        console.log 'done'
+        #console.log 'done'
     return renders
 
 class StorageCollection
