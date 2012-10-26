@@ -7,10 +7,10 @@ mixin content(part, name, content)
     ul(class='nav nav-pills', id='#{part}Content')
       each render, i in rendered
         li(class=(i==0? 'active' : ''))
-          a(href='##{render.name}', data-toggle='tab')= render.name
+          a(href='##{part}_#{render.name}', data-toggle='tab')= render.name
     div(class='tab-content')
       each render, i in rendered
-        div(class='tab-pane#{i==0 ? ' active' : ''}', id='#{render.name}')
+        div(class='tab-pane#{i==0 ? ' active' : ''}', id='#{part}_#{render.name}')
           != render.content
   
 
@@ -40,6 +40,7 @@ block content
             td
               tt= val
 
+  mixin content('request', 'Request Data', exchange.requestData)
   mixin content('response', 'Response Data', exchange.responseData)
 
 

@@ -27,6 +27,7 @@ class StreamingFile
       @err("Bad content length (expected #{@contentLength} bytes, got #{@lenProcessed})")
     else if @lenProcessed == 0
       @status = 'no data'
+      @data = ''
     else
       @rawData = new Buffer(@lenProcessed)
       i = 0
@@ -101,6 +102,7 @@ module.exports = (app, sharedState) ->
     req.on 'data', exchange.requestData.pushData
     req.on 'end', exchange.requestData.end
 
+    req.headers = caseHeaders(req.headers)
     req.headers.Host = exchange.host
     console.log "Sending request to proxy #{exchange.host}, #{exchange.path}"
     proxy.proxyRequest req, res, {host: exchange.host, port: exchange.port}

@@ -12,7 +12,6 @@ class Renderer
     content: @render(file)
 
   canRender: (contentType) ->
-    console.log @contentTypes
     for typeMatch in @contentTypes
       if typeof(typeMatch) == 'string'
         if contentType == typeMatch
@@ -29,6 +28,7 @@ class RawRenderer extends Renderer
     /^image\/svg\+xml/
     /^application\/xml/
     /^application\/json/
+    /^application\/x-www-form-urlencoded/
   ]
   renderTemplate: jade.compile('pre= data')
 
@@ -85,12 +85,13 @@ class DownloadRenderer extends Renderer
     ''')
 
   render: (file) ->
+    console.log file
     @renderTemplate({file: file, filesize})
 
 class RenderManager
   constructor: ->
     @renderers = [
-      new SyntaxRenderer()
+      #new SyntaxRenderer()
       new RawRenderer()
       new DownloadRenderer()
     ]
@@ -101,9 +102,7 @@ class RenderManager
     renders = []
     for renderer in @renderers
       if renderer.canRender(file.contentType)
-        #console.log "#{renderer.name} #{file.contentType}"
         renders.push renderer.get(file)
-        #console.log 'done'
     return renders
 
 class StorageCollection
@@ -145,6 +144,8 @@ module.exports = (app, sharedState) ->
 
   app.get '/exchange/:id', (req, res) ->
     exchange = sharedState.exchanges.get req.params.id
+    if not exchange?
+      res.redirect '/'
     renderer = new RenderManager()
     res.render 'exchange', {exchange, renderer: renderer.render}
 
