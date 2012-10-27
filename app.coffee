@@ -97,7 +97,9 @@ class RenderManager
     ]
 
   render: (file) =>
-    if file.data?.length == 0
+    if not file.data?
+      return []
+    if file.data.length == 0
       return []
     renders = []
     for renderer in @renderers

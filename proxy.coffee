@@ -55,7 +55,10 @@ module.exports = (app, sharedState) ->
     hostbase = app.get 'proxy host'
     hregex = new RegExp("([\\d\\w]+)\\.#{hostbase}")
     result = hregex.exec(host)
-    result[1]
+    if result
+      result[1]
+    else
+      console.log "no match for #{host}"
 
   caseHeaders = (headers) ->
     newHeaders = {}
@@ -77,6 +80,10 @@ module.exports = (app, sharedState) ->
       requestData: streamingFileFromHeaders(req.headers)
 
     exchange.id = sharedState.exchanges.add(exchange)
+
+    if streamId not in sharedState.streams
+      res.write('bad')
+      return
 
     sharedState.streams[streamId].unshift(exchange)
 

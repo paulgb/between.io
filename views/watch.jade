@@ -18,8 +18,8 @@ block content
             td= exchange.method
             td= exchange.responseStatus
             td= exchange.path
-            td= exchange.responseHeaders['Content-Type']
-            td= exchange.responseHeaders['Content-Length']
+            td= (exchange.responseHeaders || {})['Content-Type']
+            td= (exchange.responseHeaders || {})['Content-Length']
             td
               a(href='/exchange/#{exchange.id}') view
   else

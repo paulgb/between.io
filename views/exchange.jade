@@ -13,7 +13,6 @@ mixin content(part, name, content)
         div(class='tab-pane#{i==0 ? ' active' : ''}', id='#{part}_#{render.name}')
           != render.content
   
-
 block content
   div(class='row')
     div(class='span6')
@@ -42,5 +41,4 @@ block content
 
   mixin content('request', 'Request Data', exchange.requestData)
   mixin content('response', 'Response Data', exchange.responseData)
-
 
