@@ -31,5 +31,5 @@ require('./app')(app, models)
 http.createServer(app).listen app.get('port'), ->
   console.log "Express server listening on port " + app.get('port')
 
-#require('./proxy')(app, models)
+require('./proxy')(app, models)
 

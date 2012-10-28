@@ -1,4 +1,6 @@
 
+zlib = require 'zlib'
+
 ALPHANUM_RADIX = 36
 
 class StorageCollection
@@ -45,7 +47,49 @@ class Interceptor extends Model
 
 class Exchange extends Model
 
+class StreamingFile extends Model
+  constructor: ({@contentType,
+                 @contentEncoding,
+                 @contentLength}) ->
+    @chunks = []
+    @lenProcessed = 0
+    @status = 'open'
+
+  write: (data) =>
+    @chunks.push(data)
+    @lenProcessed += data.length
+
+  err: (@error) ->
+    console.log("Error: #{@error}")
+
+  end: =>
+    if @contentLength? and @lenProcessed.toString() != @contentLength
+      @status = 'error'
+      @err("Bad content length (expected #{@contentLength} bytes, got #{@lenProcessed})")
+    else if @lenProcessed == 0
+      @status = 'no data'
+      @data = ''
+    else
+      @rawData = new Buffer(@lenProcessed)
+      i = 0
+      for chunk in @chunks
+        chunk.copy @rawData, i, 0, chunk.length
+        i += chunk.length
+
+      if @contentEncoding == 'gzip'
+        zlib.gunzip @rawData, (err, data) =>
+          if err
+            @status = 'error'
+            @err(err)
+          else
+            @status = 'done'
+            @data = data
+      else
+        @status = 'done'
+        @data = @rawData
+
 module.exports = models =
   interceptors: new StorageCollection(Interceptor, true, true)
   exchanges: new StorageCollection(Exchange, true, true)
+  files: new StorageCollection(StreamingFile, true, true)
 

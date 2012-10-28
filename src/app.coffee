@@ -1,6 +1,5 @@
 
-jade = require('jade')
-highlight = require('highlight.js')
+RenderManager = require('./renderers')
 
 module.exports = (app, models) ->
   # for testing only!
@@ -18,7 +17,7 @@ module.exports = (app, models) ->
 
   app.get '/transcript/:id', (req, res) ->
     interceptor = models.interceptors.get req.params.id
-    res.render 'transcript', {interceptor, transcript: interceptor.transcript}
+    res.render 'transcript', {interceptor}
 
   app.get '/exchange/:id', (req, res) ->
     exchange = models.exchanges.get req.params.id

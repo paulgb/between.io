@@ -4,10 +4,10 @@ httpProxy = require 'http-proxy'
 exports.ProxyServer = class ProxyServer
   # Class representing an HTTP proxy, instrumented with 
   # hooks to capture and modify the request and response
-  # before they are forwarded. It is left to subclasses
-  # to implement these functions.
+  # before they are forwarded. The constructor takes 
+  # a class as an argument that is constructed for each
+  # request and recieves the following callbacks:
   #
-  # The subclass can override the following methods:
   #   getTarget(req)
   #     given the request object, return an Object
   #     with attributes {host, port, https} of the server
@@ -26,28 +26,36 @@ exports.ProxyServer = class ProxyServer
   #     called when the server sends a chunk of data
   #   onResponseEnd()
   #     called when the server ends the connection
-  constructor: (@port = 80) ->
+  constructor: (cls, @port = 80) ->
     @proxy = httpProxy.createServer (req, res, proxy) =>
-      @onRequestWriteHead? req.method, req.url, req.headers
-      target = @getTarget req if @getTarget?
+      exchange = new cls()
+
+      if exchange.getTarget
+        target = exchange.getTarget req
+      exchange.onRequestWriteHead? req.method, req.url, req.headers
 
       res._oldEnd = res.end
       res.end = =>
-        @onResponseEnd?()
+        exchange.onResponseEnd?()
         res._oldEnd()
 
       res._oldWrite = res.write
       res.write = (chunk) =>
-        @onResponseWrite? chunk
+        exchange.onResponseWrite? chunk
         res._oldWrite chunk
 
       res._oldWriteHead = res.writeHead
       res.writeHead = (statusCode, headers) =>
-        @onResponseWriteHead? statusCode, headers
+        exchange.onResponseWriteHead? statusCode, headers
         res._oldWriteHead statusCode, headers
       
-      req.on 'data', @onRequestWrite if @onRequestWrite
-      req.on 'end', @onRequestEnd if @onRequestEnd
+      req.on 'data', (chunk) ->
+        if exchange.onRequestWrite
+          exchange.onRequestWrite(chunk)
+
+      req.on 'end', ->
+        if exchange.onRequestEnd
+          exchange.onRequestEnd()
 
       proxy.proxyRequest req, res, target
 

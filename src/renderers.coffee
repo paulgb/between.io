@@ -1,4 +1,7 @@
 
+jade = require('jade')
+highlight = require('highlight.js')
+
 class Renderer
   render: (file) ->
     @renderTemplate({file: file, data: file.data})
@@ -70,10 +73,10 @@ class DownloadRenderer extends Renderer
         td= file.contentType
       tr
         th Size
-        td= filesize(file.data.length)
+        td= file.data.length
       tr
         th Raw Size
-        td= filesize(file.rawData.length)
+        td= file.rawData.length
       tr
         th Download
         td
@@ -81,13 +84,12 @@ class DownloadRenderer extends Renderer
     ''')
 
   render: (file) ->
-    console.log file
-    @renderTemplate({file: file, filesize})
+    @renderTemplate({file: file})
 
-class RenderManager
+module.exports = class RenderManager
   constructor: ->
     @renderers = [
-      #new SyntaxRenderer()
+      new SyntaxRenderer()
       new RawRenderer()
       new DownloadRenderer()
     ]
@@ -102,3 +104,4 @@ class RenderManager
       if renderer.canRender(file.contentType)
         renders.push renderer.get(file)
     return renders
+
