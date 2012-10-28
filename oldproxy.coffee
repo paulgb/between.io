@@ -3,12 +3,12 @@ httpProxy = require 'http-proxy'
 http = require 'http'
 zlib = require 'zlib'
 
-streamingFileFromHeaders = (headers) ->
-  new StreamingFile(headers['content-type'],
-                    headers['content-encoding'],
-                    headers['content-length'])
-
 class StreamingFile
+  @fromHeaders: (headers) ->
+    new StreamingFile(headers['content-type'],
+                      headers['content-encoding'],
+                      headers['content-length'])
+
   constructor: (@contentType, @contentEncoding, @contentLength) ->
     @chunks = []
     @lenProcessed = 0
