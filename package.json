@@ -13,5 +13,6 @@
     "http-proxy": "*",
     "highlight.js": "*",
     "filesize": "*",
+    "nodeunit": "*"
   }
 }

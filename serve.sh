@@ -1,4 +1,4 @@
 #!/bin/bash
 
-authbind --deep coffee server.coffee
+authbind node app.js
 

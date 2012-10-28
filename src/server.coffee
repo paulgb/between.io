@@ -5,6 +5,8 @@ path = require 'path'
 
 app = express()
 
+models = require('./models')
+
 app.configure ->
   app.set 'port', process.env.PORT || 3000
   app.set 'views', __dirname + '/views'
@@ -19,16 +21,15 @@ app.configure ->
   app.use require('less-middleware')({ src: __dirname + '/public' })
   app.use express.static(path.join(__dirname, 'public'))
 
-  app.set 'proxy host', 'local'
+  app.set 'proxy host', 'between.io'
 
 app.configure 'development', ->
   app.use express.errorHandler()
 
-sharedState = {}
-require('./app')(app, sharedState)
+require('./app')(app, models)
 
 http.createServer(app).listen app.get('port'), ->
   console.log "Express server listening on port " + app.get('port')
 
-require('./proxy')(app, sharedState)
+#require('./proxy')(app, models)
 

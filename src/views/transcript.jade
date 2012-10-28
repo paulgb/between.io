@@ -1,8 +1,8 @@
 extends layout
 
 block content
-  h1 #{streamId}.local &rarr; #{host}
-  if stream.length > 0
+  h1 #{interceptor.id}.#{settings['proxy host']} &rarr; #{interceptor.host}
+  if interceptor.transcript.length > 0
     table(class='table table-striped table-bordered table-condensed')
       thead
         tr
@@ -13,7 +13,7 @@ block content
           th(style='width: 120px;') Content Length
           th(style='width: 80px;') View
       tbody
-        each exchange in stream
+        each exchange in interceptor.transcript
           tr
             td= exchange.method
             td= exchange.responseStatus
@@ -23,5 +23,5 @@ block content
             td
               a(href='/exchange/#{exchange.id}') view
   else
-    p No exchanges yet! HTTP requests to the host #{streamId}.local will appear here.
+    p No exchanges yet! HTTP requests to the host #{interceptor.id}.#{settings['proxy host']} will appear here.
 
