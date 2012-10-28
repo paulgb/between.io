@@ -50,7 +50,8 @@ class Exchange extends Model
 class StreamingFile extends Model
   constructor: ({@contentType,
                  @contentEncoding,
-                 @contentLength}) ->
+                 @contentLength,
+                 @fileName}) ->
     @chunks = []
     @lenProcessed = 0
     @status = 'open'

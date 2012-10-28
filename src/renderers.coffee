@@ -2,6 +2,8 @@
 jade = require('jade')
 highlight = require('highlight.js')
 
+contentTypes = require('./contentTypes')
+
 class Renderer
   render: (file) ->
     @renderTemplate({file: file, data: file.data})
@@ -11,46 +13,24 @@ class Renderer
     content: @render(file)
 
   canRender: (contentType) ->
-    for typeMatch in @contentTypes
-      if typeof(typeMatch) == 'string'
-        if contentType == typeMatch
-          return true
-      else if typeMatch.test(contentType)
-        return true
-    return false
+    contentTypes.matchType(contentType, @contentTypes)
 
 class RawRenderer extends Renderer
   name: 'plaintext'
-  contentTypes: [
-    /^text/
-    /^application\/(x-)?javascript/
-    /^image\/svg\+xml/
-    /^application\/xml/
-    /^application\/json/
-    /^application\/x-www-form-urlencoded/
-  ]
+  contentTypes: contentTypes.plaintextTypes
   renderTemplate: jade.compile('pre= data')
 
+class ImageRenderer extends Renderer
+  name: 'image'
+  contentTypes: contentTypes.imageTypes
+  renderTemplate: jade.compile '''
+    img(src='/image/#{file.id}/#{file.fileName}')
+    '''
 class SyntaxRenderer extends Renderer
   name: 'syntax'
 
-  typeMappings =
-    'application/x-ruby': 'ruby'
-    'application/x-python': 'python'
-    'application/json': 'json'
-    'text/css': 'css'
-    'application/xml': 'xml'
-    'text/html': 'xml'
-    'image/svg+xml': 'xml'
-    'text/x-haskell': 'haskell'
-    'text/x-perl': 'perl'
-    'application/x-httpd-php': 'php'
-    'text/javascript': 'javascript'
-    'application/javascript': 'javascript'
-    'application/x-javascript': 'javascript'
-
-  typeMappings: typeMappings
-  contentTypes: (type for type of typeMappings)
+  typeMappings: contentTypes.typeMappings
+  contentTypes: (type for type of contentTypes.typeMappings)
 
   renderTemplate: jade.compile('pre!= data')
   
@@ -61,9 +41,7 @@ class SyntaxRenderer extends Renderer
 class DownloadRenderer extends Renderer
   name: 'info'
 
-  contentTypes: [
-    /./
-  ]
+  canRender: -> true
 
   renderTemplate: jade.compile(
     '''
@@ -80,7 +58,7 @@ class DownloadRenderer extends Renderer
       tr
         th Download
         td
-          a(href='#') Download
+          a(href='/file/#{file.id}/#{file.fileName}') Download
     ''')
 
   render: (file) ->
@@ -89,6 +67,7 @@ class DownloadRenderer extends Renderer
 module.exports = class RenderManager
   constructor: ->
     @renderers = [
+      new ImageRenderer()
       new SyntaxRenderer()
       new RawRenderer()
       new DownloadRenderer()

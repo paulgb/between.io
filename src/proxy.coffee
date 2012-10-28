@@ -2,6 +2,12 @@
 {ProxyServer} = require('./proxyServer')
 {Interceptor} = require('./models')
 
+getFilename = (path, def) ->
+  if result = /([^\/]+)$/.exec(path)
+    result[1]
+  else
+    def
+
 module.exports = (app, models) ->
   getInterceptorIdFromHost = (host) ->
     hostbase = app.get 'proxy host'
@@ -31,6 +37,7 @@ module.exports = (app, models) ->
     onRequestWriteHead: (method, path, requestHeaders) ->
       host = @interceptor.host
       requestHeaders = caseHeaders requestHeaders
+      @responseFilename = getFilename(path, 'download')
       @exchange = models.exchanges.create {
         method,
         path,
@@ -43,6 +50,7 @@ module.exports = (app, models) ->
         contentEncoding: requestHeaders['Content-Encoding']
         contentType: requestHeaders['Content-Type']
         contentLength: requestHeaders['Content-Length']
+        fileName: 'postdata.txt'
 
       @onRequestWrite = @exchange.requestData.write
       @onRequestEnd = @exchange.requestData.end
@@ -55,10 +63,10 @@ module.exports = (app, models) ->
         contentEncoding: responseHeaders['Content-Encoding']
         contentType: responseHeaders['Content-Type']
         contentLength: responseHeaders['Content-Length']
+        fileName: @responseFilename
 
       @onResponseWrite = @exchange.responseData.write
       @onResponseEnd = @exchange.responseData.end
-
 
   new ProxyServer(BetweenProxy)
 
