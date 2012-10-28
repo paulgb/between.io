@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  h1 between
+  h1 between.io
   p
     | Enter the 
     strong hostname 
@@ -9,5 +9,5 @@ block content
   form(method='POST', action='/new')
     div(class='input-append')
       input(class='span7', size=16, type='text', placeholder='graph.facebook.com', name='host')
-      input(class='btn span1', size=16, type='submit', value='go')
+      input(class='btn btn-primary span1', size=16, type='submit', value='go')
 

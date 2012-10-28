@@ -32,6 +32,9 @@ exports.ProxyServer = class ProxyServer
 
       if exchange.getTarget
         target = exchange.getTarget req
+      else
+        res.writeHead(404)
+        res.end()
       exchange.onRequestWriteHead? req.method, req.url, req.headers
 
       res._oldEnd = res.end

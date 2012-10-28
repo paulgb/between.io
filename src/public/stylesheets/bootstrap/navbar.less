@@ -26,7 +26,6 @@
   #gradient > .vertical(@navbarBackgroundHighlight, @navbarBackground);
   border: 1px solid @navbarBorder;
   .border-radius(4px);
-  .box-shadow(0 1px 4px rgba(0,0,0,.065));
 
   // Prevent floats from breaking the navbar
   .clearfix();
@@ -53,7 +52,7 @@
   padding: ((@navbarHeight - @baseLineHeight) / 2) 20px ((@navbarHeight - @baseLineHeight) / 2);
   margin-left: -20px; // negative indent to left-align the text down the page
   font-size: 20px;
-  font-weight: 200;
+  font-weight: bold;
   color: @navbarBrandColor;
   text-shadow: 0 1px 0 @navbarBackgroundHighlight;
   &:hover {
@@ -81,9 +80,8 @@
 // -------------------------
 .navbar .divider-vertical {
   height: @navbarHeight;
-  margin: 0 9px;
-  border-left: 1px solid @navbarBackground;
-  border-right: 1px solid @navbarBackgroundHighlight;
+  border-left: 1px solid #009b00;
+  border-right: 1px solid #44c532;
 }
 
 // Buttons in navbar

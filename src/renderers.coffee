@@ -33,13 +33,16 @@ class DownloadLinker extends Linker
 class RawRenderer extends Renderer
   name: 'plaintext'
   contentTypes: contentTypes.plaintextTypes
-  renderTemplate: jade.compile('pre= data')
+  renderTemplate: jade.compile '''
+  pre
+    code= data
+  '''
 
 class ImageRenderer extends Renderer
   name: 'image'
   contentTypes: contentTypes.imageTypes
   renderTemplate: jade.compile '''
-    img(src='/image/#{file.id}/#{file.fileName}')
+    img(class='preview', src='/image/#{file.id}/#{file.fileName}')
     '''
 class SyntaxRenderer extends Renderer
   name: 'syntax'
@@ -47,7 +50,9 @@ class SyntaxRenderer extends Renderer
   typeMappings: contentTypes.typeMappings
   contentTypes: (type for type of contentTypes.typeMappings)
 
-  renderTemplate: jade.compile('pre!= data')
+  renderTemplate: jade.compile '''
+  pre
+    code!= data'''
   
   render: (file) ->
     highlighted = highlight.highlightAuto(file.data.toString('ascii'))

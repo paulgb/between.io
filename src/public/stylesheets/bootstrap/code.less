@@ -7,17 +7,21 @@
 code,
 pre {
   padding: 0 3px 2px;
-  #font > #family > .monospace;
+  font-family: @monoFontFamily;
   font-size: @baseFontSize - 2;
   color: @grayDark;
   .border-radius(3px);
+}
+
+tt, samp {
+  font-family: @monoFontFamily;
 }
 
 // Inline code
 code {
   padding: 2px 4px;
   color: #d14;
-  background-color: #f7f7f9;
+  background-color: @wellBackground;
   border: 1px solid #e1e1e8;
 }
 
@@ -32,10 +36,9 @@ pre {
   word-wrap: break-word;
   white-space: pre;
   white-space: pre-wrap;
-  background-color: #f5f5f5;
-  border: 1px solid #ccc; // fallback for IE7-8
-  border: 1px solid rgba(0,0,0,.15);
-  .border-radius(4px);
+  background-color: @wellBackground;
+  border: 1px solid @wellBorder;
+  .border-radius(2px);
 
   // Make prettyprint styles more spaced out for readability
   &.prettyprint {
@@ -56,3 +59,4 @@ pre {
   max-height: 340px;
   overflow-y: scroll;
 }
+
