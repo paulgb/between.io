@@ -1,6 +1,5 @@
 
 zlib = require 'zlib'
-http = require 'http'
 
 ALPHANUM_RADIX = 36
 
@@ -47,8 +46,6 @@ class Interceptor extends Model
     super(base)
 
 class Exchange extends Model
-  reasonPhrase: ->
-    http.STATUS_CODES[@responseStatus]
 
 class StreamingFile extends Model
   constructor: ({@contentType,

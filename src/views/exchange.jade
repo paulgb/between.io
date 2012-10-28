@@ -1,21 +1,15 @@
 extends layout
 
 mixin content(part, name, content)
-  - var tabs = renderer(content)
+  - var rendered = renderer(content)
   if content.status == 'done'
     h3= name
-    div(class='row')
-      div(class='span6')
-        ul(class='nav nav-pills', id='#{part}Content')
-          each render, i in tabs.renders
-            li(class=(i==0? 'active' : ''))
-              a(href='##{part}_#{render.name}', data-toggle='tab')= render.name
-      div(class='span6', style='text-align: right')
-        div(class='btn-group')
-          each link in tabs.links
-            a(class='btn', href=link.href, target='_blank')= link.name
+    ul(class='nav nav-pills', id='#{part}Content')
+      each render, i in rendered
+        li(class=(i==0? 'active' : ''))
+          a(href='##{part}_#{render.name}', data-toggle='tab')= render.name
     div(class='tab-content')
-      each render, i in tabs.renders
+      each render, i in rendered
         div(class='tab-pane#{i==0 ? ' active' : ''}', id='#{part}_#{render.name}')
           != render.content
   
@@ -27,6 +21,7 @@ block content
         span http://
         span(style='color: #999')= exchange.host
         span= exchange.path
+      h3 Headers
       table(class='table table-headers')
         for val, header in exchange.requestHeaders
           tr
@@ -35,7 +30,8 @@ block content
               tt= val
 
     div(class='span6')
-      h1 #{exchange.responseStatus} #{exchange.reasonPhrase()}
+      h1 #{exchange.responseStatus} #{exchange.responsePhrase}
+      h3 Headers
       table(class='table table-headers')
         for val, header in exchange.responseHeaders
           tr

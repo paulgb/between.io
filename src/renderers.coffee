@@ -15,21 +15,6 @@ class Renderer
   canRender: (contentType) ->
     contentTypes.matchType(contentType, @contentTypes)
 
-class Linker extends Renderer
-  get: (file) ->
-    name: @name
-    href: @link(file)
-
-class RawLinker extends Linker
-  name: 'raw'
-  contentTypes: contentTypes.plaintextTypes
-  link: (file) -> "/raw/#{file.id}/#{file.fileName}"
-
-class DownloadLinker extends Linker
-  name: 'download'
-  contentTypes: contentTypes.allTypes
-  link: (file) -> "/file/#{file.id}/#{file.fileName}"
-
 class RawRenderer extends Renderer
   name: 'plaintext'
   contentTypes: contentTypes.plaintextTypes
@@ -58,7 +43,7 @@ class SyntaxRenderer extends Renderer
     highlighted = highlight.highlightAuto(file.data.toString('ascii'))
     @renderTemplate({data: highlighted.value})
 
-class InfoRenderer extends Renderer
+class DownloadRenderer extends Renderer
   name: 'info'
 
   canRender: -> true
@@ -90,9 +75,7 @@ module.exports = class RenderManager
       new ImageRenderer()
       new SyntaxRenderer()
       new RawRenderer()
-      new InfoRenderer()
-      new RawLinker()
-      new DownloadLinker()
+      new DownloadRenderer()
     ]
 
   render: (file) =>
@@ -101,13 +84,8 @@ module.exports = class RenderManager
     if file.data.length == 0
       return []
     renders = []
-    links = []
     for renderer in @renderers
       if renderer.canRender(file.contentType)
-        result = renderer.get(file)
-        if result.content?
-          renders.push(result)
-        if result.href?
-          links.push(result)
-    return {renders, links}
+        renders.push renderer.get(file)
+    return renders
 
