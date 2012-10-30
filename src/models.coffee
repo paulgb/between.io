@@ -55,10 +55,10 @@ class Interceptor extends Model
 
 class Exchange extends Model
   getRequestData: ->
-    model.files.get @requestFile
+    models.files.get @requestData
 
   getResponseData: ->
-    models.files.get @responseFile
+    models.files.get @responseData
 
   reasonPhrase: ->
     http.STATUS_CODES[@responseStatus]
