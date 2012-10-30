@@ -43,6 +43,6 @@ block content
             td
               tt= val
 
-  mixin content('request', 'Request Data', exchange.requestData)
-  mixin content('response', 'Response Data', exchange.responseData)
+  mixin content('request', 'Request Data', exchange.getRequestData())
+  mixin content('response', 'Response Data', exchange.getResponseData())
 

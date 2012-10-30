@@ -44,30 +44,31 @@ module.exports = (app, models) ->
         host,
         requestHeaders}
 
-      @interceptor.transcript.unshift(@exchange)
-      @interceptor.transcriptEmitter.emit 'prepend', @exchange
+      @interceptor.addExchange(@exchange)
 
-      @exchange.requestData = models.files.create
+      requestData = models.files.create
         contentEncoding: requestHeaders['Content-Encoding']
         contentType: requestHeaders['Content-Type']
         contentLength: requestHeaders['Content-Length']
         fileName: 'postdata.txt'
 
-      @onRequestWrite = @exchange.requestData.write
-      @onRequestEnd = @exchange.requestData.end
+      @exchange.requestData = requestData.id
+      @onRequestWrite = requestData.write
+      @onRequestEnd = requestData.end
      
     onResponseWriteHead: (statusCode, responseHeaders) ->
       responseHeaders = caseHeaders responseHeaders
       @exchange.responseStatus = statusCode
       @exchange.responseHeaders = responseHeaders
-      @exchange.responseData = models.files.create
+      responseData = models.files.create
         contentEncoding: responseHeaders['Content-Encoding']
         contentType: responseHeaders['Content-Type']
         contentLength: responseHeaders['Content-Length']
         fileName: @responseFilename
 
-      @onResponseWrite = @exchange.responseData.write
-      @onResponseEnd = @exchange.responseData.end
+      @exchange.responseData = responseData.id
+      @onResponseWrite = responseData.write
+      @onResponseEnd = responseData.end
 
   new ProxyServer(BetweenProxy)
 

@@ -13,8 +13,11 @@ function listenTranscript(transcriptId) {
   });
 
   socket.on('exchange', function(data) {
-    console.log(data);
     transcript.exchanges.unshift(data);
+  });
+
+  socket.on('transcript', function(data) {
+    transcript.exchanges.push.apply(transcript.exchanges, data);
   });
 }
 

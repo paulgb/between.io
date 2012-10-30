@@ -43,12 +43,23 @@ class Model
       this[k] = v
 
 class Interceptor extends Model
+  addExchange: (exchange) ->
+    @transcript.unshift(exchange)
+    @transcriptEmitter.emit 'prepend', exchange
+
   constructor: (base) ->
     @transcript = []
     @transcriptEmitter = new EventEmitter()
+
     super(base)
 
 class Exchange extends Model
+  getRequestData: ->
+    model.files.get @requestFile
+
+  getResponseData: ->
+    models.files.get @responseFile
+
   reasonPhrase: ->
     http.STATUS_CODES[@responseStatus]
 

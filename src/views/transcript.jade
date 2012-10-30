@@ -19,7 +19,7 @@ block content
         td
         td
         td
-          a(class='btn btn-mini btn-primary', href='/exchange/1') view
+          a(class='btn btn-mini btn-primary', data-bind='attr:{href:"/exchange/"+id}') view
 
   script(type='text/javascript')
     listenTranscript('#{interceptor.id}');

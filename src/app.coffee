@@ -60,6 +60,7 @@ module.exports = (app, socketio, models) ->
   socketio.sockets.on 'connection', (socket) ->
     socket.on 'subscribe', (transcriptId) ->
       transcript = models.interceptors.get transcriptId
+      socket.emit 'transcript', transcript.transcript
       transcript.transcriptEmitter.on 'prepend', (exchange) ->
         socket.emit 'exchange', exchange
 
