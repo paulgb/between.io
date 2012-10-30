@@ -2,7 +2,7 @@
 RenderManager = require('./renderers')
 contentTypes = require('./contentTypes')
 
-module.exports = (app, models) ->
+module.exports = (app, socketio, models) ->
   # for testing only!
   models.interceptors.create
     host: 'bitaesthetics.com'
@@ -57,4 +57,9 @@ module.exports = (app, models) ->
   app.get '/file/:id/:filename', fileGetter contentTypes.allTypes,
     'Content-Disposition': 'attachment'
     
+  socketio.sockets.on 'connection', (socket) ->
+    socket.on 'subscribe', (transcriptId) ->
+      transcript = models.interceptors.get transcriptId
+      transcript.transcriptEmitter.on 'prepend', (exchange) ->
+        socket.emit 'exchange', exchange
 

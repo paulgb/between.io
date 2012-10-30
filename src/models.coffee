@@ -1,6 +1,7 @@
 
 zlib = require 'zlib'
 http = require 'http'
+{EventEmitter} = require 'events'
 
 ALPHANUM_RADIX = 36
 
@@ -44,6 +45,7 @@ class Model
 class Interceptor extends Model
   constructor: (base) ->
     @transcript = []
+    @transcriptEmitter = new EventEmitter()
     super(base)
 
 class Exchange extends Model

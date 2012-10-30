@@ -45,6 +45,7 @@ module.exports = (app, models) ->
         requestHeaders}
 
       @interceptor.transcript.unshift(@exchange)
+      @interceptor.transcriptEmitter.emit 'prepend', @exchange
 
       @exchange.requestData = models.files.create
         contentEncoding: requestHeaders['Content-Encoding']

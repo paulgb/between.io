@@ -26,10 +26,14 @@ app.configure ->
 app.configure 'development', ->
   app.use express.errorHandler()
 
-require('./app')(app, models)
+server = http.createServer(app)
 
-http.createServer(app).listen app.get('port'), ->
+server.listen app.get('port'), ->
   console.log "Express server listening on port " + app.get('port')
+  
+socketio = require('socket.io').listen server
+
+require('./app')(app, socketio, models)
 
 require('./proxy')(app, models)
 
