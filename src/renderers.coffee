@@ -68,7 +68,7 @@ class InfoRenderer extends Renderer
     table(class='table table-bordered')
       tr
         th(style='width: 180px;') Type
-        td= file.contentType
+        td= file.getContentType()
       tr
         th Size
         td= file.data.length
@@ -103,7 +103,7 @@ module.exports = class RenderManager
     renders = []
     links = []
     for renderer in @renderers
-      if renderer.canRender(file.contentType)
+      if renderer.canRender(file.getContentType())
         result = renderer.get(file)
         if result.content?
           renders.push(result)
