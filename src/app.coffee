@@ -3,10 +3,6 @@ RenderManager = require('./renderers')
 contentTypes = require('./contentTypes')
 
 module.exports = (app, socketio, models) ->
-  # for testing only!
-  models.interceptors.create
-    host: 'bitaesthetics.com'
-
   fileGetter = (types, headerMods = []) ->
     (req, res) ->
       file = models.files.get req.params.id
