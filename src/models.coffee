@@ -77,6 +77,7 @@ class StreamingFile extends Model
                  @contentEncoding,
                  @contentLength,
                  @fileName}) ->
+    @contentType = @contentType.split(';')[0]
     @chunks = []
     @lenProcessed = 0
     @status = 'open'
