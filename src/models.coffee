@@ -61,6 +61,7 @@ class Exchange extends Model
     @method = null
     @responseStatus = null
     @path = null
+    @responseHeaders = null
     super(base)
 
   getRequestData: ->
