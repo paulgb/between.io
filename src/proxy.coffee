@@ -70,5 +70,5 @@ module.exports = (app, models) ->
       @onResponseWrite = responseData.write
       @onResponseEnd = responseData.end
 
-  new ProxyServer(BetweenProxy)
+  new ProxyServer(BetweenProxy, app.get 'proxy port')
 
