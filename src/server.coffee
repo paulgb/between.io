@@ -24,6 +24,10 @@ app.configure ->
 
   app.set 'proxy host', process.env.PROXY_HOST || 'between.io'
 
+if process.env.AUTH_USER?
+  auth = express.basicAuth process.env.AUTH_USER, process.env.AUTH_PASS
+  app.get '/', auth, (req, res, next) -> next()
+
 app.configure 'development', ->
   app.use express.errorHandler()
 
