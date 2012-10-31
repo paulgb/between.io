@@ -2,6 +2,7 @@
 
 if [ -e config.sh ]
 then
+    echo 'using config.sh'
     source config.sh
 fi
 
