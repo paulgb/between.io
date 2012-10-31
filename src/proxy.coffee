@@ -60,6 +60,8 @@ module.exports = (app, models) ->
       responseHeaders = caseHeaders responseHeaders
       @exchange.responseStatus = statusCode
       @exchange.responseHeaders = responseHeaders
+      @interceptor.updateExchange(@exchange)
+
       responseData = models.files.create
         contentEncoding: responseHeaders['Content-Encoding']
         contentType: responseHeaders['Content-Type']

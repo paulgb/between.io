@@ -43,6 +43,9 @@ class Model
       this[k] = v
 
 class Interceptor extends Model
+  updateExchange: (exchange) ->
+    @transcriptEmitter.emit 'update', exchange
+
   addExchange: (exchange) ->
     @transcript.unshift(exchange)
     @transcriptEmitter.emit 'prepend', exchange
@@ -54,6 +57,12 @@ class Interceptor extends Model
     super(base)
 
 class Exchange extends Model
+  constructor: (base) ->
+    @method = null
+    @responseStatus = null
+    @path = null
+    super(base)
+
   getRequestData: ->
     models.files.get @requestData
 

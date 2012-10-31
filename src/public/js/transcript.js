@@ -4,6 +4,8 @@ function listenTranscript(transcriptId) {
     exchanges: ko.observableArray()
   };
 
+  var exchangeMap = {};
+
   ko.applyBindings(transcript);
 
   var socket = io.connect();
@@ -12,12 +14,25 @@ function listenTranscript(transcriptId) {
     socket.emit('subscribe', transcriptId);
   });
 
-  socket.on('exchange', function(data) {
-    transcript.exchanges.unshift(data);
+  socket.on('transcript', function(exchanges) {
+    for(i = 0; i < exchanges.length; i++) {
+      var exchange = exchanges[i];
+      var observableExchange = ko.observable(exchange);
+      exchangeMap[exchange.id] = observableExchange;
+      transcript.exchanges.unshift(observableExchange);
+    }
   });
 
-  socket.on('transcript', function(data) {
-    transcript.exchanges.push.apply(transcript.exchanges, data);
+  socket.on('update', function(exchange) {
+    var observableExchange = exchangeMap[exchange.id];
+    observableExchange(exchange);
   });
+
+  socket.on('exchange', function(exchange) {
+    var observableExchange = ko.observable(exchange);
+    transcript.exchanges.unshift(observableExchange);
+    exchangeMap[exchange.id] = observableExchange;
+  });
+
 }
 
