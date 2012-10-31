@@ -1,8 +1,9 @@
 
-jade = require('jade')
-highlight = require('highlight.js')
+jade = require 'jade'
+highlight = require 'highlight.js'
+qs = require 'querystring'
 
-contentTypes = require('./contentTypes')
+contentTypes = require './contentTypes'
 
 class Renderer
   render: (file) ->
@@ -30,6 +31,26 @@ class DownloadLinker extends Linker
   contentTypes: contentTypes.allTypes
   link: (file) -> "/file/#{file.id}/#{file.fileName}"
 
+class FormRenderer extends Renderer
+  name: 'postdata'
+
+  contentTypes: [
+    'application/x-www-form-urlencoded'
+  ]
+
+  renderTemplate: jade.compile '''
+    table(class='table table-headers')
+      for val, key in keyvals
+        tr
+          th= key
+          td= val
+    '''
+
+  render: (file) ->
+    data = file.data.toString('ascii')
+    keyvals = qs.parse(data)
+    @renderTemplate({keyvals})
+
 class RawRenderer extends Renderer
   name: 'plaintext'
   contentTypes: contentTypes.plaintextTypes
@@ -44,6 +65,7 @@ class ImageRenderer extends Renderer
   renderTemplate: jade.compile '''
     img(class='preview', src='/image/#{file.id}/#{file.fileName}')
     '''
+
 class SyntaxRenderer extends Renderer
   name: 'syntax'
 
@@ -87,6 +109,7 @@ class InfoRenderer extends Renderer
 module.exports = class RenderManager
   constructor: ->
     @renderers = [
+      new FormRenderer()
       new ImageRenderer()
       new SyntaxRenderer()
       new RawRenderer()
