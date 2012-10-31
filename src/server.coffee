@@ -25,6 +25,10 @@ app.configure ->
   app.set 'proxy host', process.env.PROXY_HOST || 'between.io'
 
 if process.env.AUTH_USER?
+  app.get '/healthcheck', (req, res) ->
+      res.writeHead(200)
+      res.end()
+
   auth = express.basicAuth process.env.AUTH_USER, process.env.AUTH_PASS
   app.get '/', auth, (req, res, next) -> next()
 
