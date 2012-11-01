@@ -1,4 +1,6 @@
 
+fs = require 'fs'
+
 {ProxyServer} = require('./proxyServer')
 {Interceptor} = require('./models')
 
@@ -26,7 +28,7 @@ module.exports = (app, models) ->
     return newHeaders
 
   class BetweenProxy
-    getTarget: (req) ->
+    getTarget: (req, https) ->
       req.headers = caseHeaders(req.headers)
       interId = getInterceptorIdFromHost req.headers.Host
       @interceptor = models.interceptors.get interId
@@ -34,8 +36,12 @@ module.exports = (app, models) ->
         return
 
       req.headers.host = @interceptor.host
-      host: @interceptor.host
-      port: @interceptor.port ? 80
+      host = @interceptor.host
+      if https
+        port = 443
+      else
+        port = 80
+      {host, port}
 
     onRequestWriteHead: (method, path, requestHeaders) ->
       host = @interceptor.host
@@ -75,5 +81,10 @@ module.exports = (app, models) ->
       @onResponseWrite = responseData.write
       @onResponseEnd = responseData.end
 
-  new ProxyServer(BetweenProxy, app.get 'proxy port')
+  privateKey = fs.readFileSync(app.get('private key'), 'ascii')
+  cert = fs.readFileSync(app.get('certificate'), 'ascii')
+  new ProxyServer(BetweenProxy, app.get('proxy port'),
+    app.get('proxy https port'),
+    privateKey,
+    cert)
 

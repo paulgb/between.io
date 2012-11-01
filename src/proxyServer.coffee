@@ -26,12 +26,13 @@ exports.ProxyServer = class ProxyServer
   #     called when the server sends a chunk of data
   #   onResponseEnd()
   #     called when the server ends the connection
-  constructor: (cls, @port = 80) ->
-    @proxy = httpProxy.createServer (req, res, proxy) =>
+  constructor: (cls, @port = 80, @securePort = 443, @privateKey, @cert) ->
+    handleRequest = (https) => (req, res, proxy) =>
+      console.log req
       exchange = new cls()
 
       if exchange.getTarget
-        target = exchange.getTarget req
+        target = exchange.getTarget req, https
       else
         res.writeHead(404)
         res.end()
@@ -62,10 +63,19 @@ exports.ProxyServer = class ProxyServer
 
       proxy.proxyRequest req, res, target
 
+    @proxy = httpProxy.createServer handleRequest(false)
+    @httpsProxy = httpProxy.createServer handleRequest(true),
+      target:
+        https: true
+      https:
+        key: @privateKey
+        cert: @cert
     @start()
 
   start: ->
     @proxy.listen @port, =>
       console.log "Proxy listening on port #{@port}"
+    @httpsProxy.listen @securePort, =>
+      console.log "HTTPS Proxy listening on port #{@securePort}"
 
 
