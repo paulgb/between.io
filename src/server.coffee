@@ -12,7 +12,7 @@ app.configure ->
   app.set 'proxy port', process.env.PROXY_PORT || 80
   app.set 'proxy https port', process.env.PROXY_HTTPS_PORT || 443
   app.set 'private key', process.env.PRIVATE_KEY || 'testkeys/key.pem'
-  app.set 'certificate', process.env.CERTIFICATE || 'testkeys/cert.crt'
+  app.set 'certificate', process.env.CERTIFICATE || 'testkeys/wildcard.crt'
   app.set 'views', __dirname + '/views'
   app.set 'view engine', 'jade'
   app.use express.favicon()
