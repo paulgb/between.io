@@ -28,7 +28,7 @@ module.exports = (app, models) ->
     return newHeaders
 
   class BetweenProxy
-    getTarget: (req, https) ->
+    getTarget: (req, server) ->
       req.headers = caseHeaders(req.headers)
       interId = getInterceptorIdFromHost req.headers.Host
       @interceptor = models.interceptors.get interId
@@ -37,7 +37,7 @@ module.exports = (app, models) ->
 
       req.headers.host = @interceptor.host
       host = @interceptor.host
-      if https
+      if server.https
         port = 443
       else
         port = 80
@@ -83,8 +83,15 @@ module.exports = (app, models) ->
 
   privateKey = fs.readFileSync(app.get('private key'), 'ascii')
   cert = fs.readFileSync(app.get('certificate'), 'ascii')
-  new ProxyServer(BetweenProxy, app.get('proxy port'),
-    app.get('proxy https port'),
-    privateKey,
-    cert)
+  servers =
+    http:
+      port: app.get 'proxy port'
+    https:
+      port: app.get 'proxy https port'
+      target:
+        https: true
+      https:
+        key: privateKey
+        cert: cert
+  new ProxyServer(BetweenProxy, servers)
 
