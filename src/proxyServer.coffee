@@ -28,14 +28,14 @@ exports.ProxyServer = class ProxyServer
   #     called when the server ends the connection
   constructor: (cls, @port = 80, @securePort = 443, @privateKey, @cert) ->
     handleRequest = (https) => (req, res, proxy) =>
-      console.log req
       exchange = new cls()
 
-      if exchange.getTarget
-        target = exchange.getTarget req, https
-      else
+      target = exchange.getTarget req, https
+      if not target?
         res.writeHead(404)
         res.end()
+        return
+
       exchange.onRequestWriteHead? req.method, req.url, req.headers
 
       res._oldEnd = res.end

@@ -32,7 +32,8 @@ module.exports = (app, models) ->
       req.headers = caseHeaders(req.headers)
       interId = getInterceptorIdFromHost req.headers.Host
       @interceptor = models.interceptors.get interId
-      if not @interceptor?
+
+      if not @interceptor
         return
 
       req.headers.host = @interceptor.host
