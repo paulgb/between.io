@@ -19,7 +19,7 @@ function listenTranscript(transcriptId) {
       var exchange = exchanges[i];
       var observableExchange = ko.observable(exchange);
       exchangeMap[exchange.id] = observableExchange;
-      transcript.exchanges.unshift(observableExchange);
+      transcript.exchanges.push(observableExchange);
     }
   });
 
