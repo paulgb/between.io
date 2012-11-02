@@ -55,9 +55,12 @@ module.exports = (app, socketio, models) ->
     
   socketio.sockets.on 'connection', (socket) ->
     socket.on 'subscribe', (transcriptId) ->
+      console.log "got subscribe request for #{transcriptId}"
       transcript = models.interceptors.get transcriptId
+      console.log "got transcript for #{transcriptId}"
       if not transcript?
           return
+      console.log "emitting transcript for #{transcriptId}"
       socket.emit 'transcript', transcript.transcript
 
       transcript.transcriptEmitter.on 'prepend', (exchange) ->

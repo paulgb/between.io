@@ -28,11 +28,10 @@ exports.ProxyServer = class ProxyServer
   #     called when the server ends the connection
   constructor: (cls, @servers) ->
     handleRequest = (server) => (req, res, proxy) =>
-      console.log req
       exchange = new cls()
 
       target = exchange.getTarget req, server
-      if not target? 
+      if not target?
         res.writeHead(404)
         res.end()
         return

@@ -10,17 +10,21 @@ function listenTranscript(transcriptId) {
 
   var socket = io.connect();
 
+  console.log('connecting');
   socket.on('connect', function() {
+    console.log('connected');
     socket.emit('subscribe', transcriptId);
   });
 
   socket.on('transcript', function(exchanges) {
+    console.log('got transcript, '+exchanges.length+' exchanges');
     for(i = 0; i < exchanges.length; i++) {
       var exchange = exchanges[i];
       var observableExchange = ko.observable(exchange);
       exchangeMap[exchange.id] = observableExchange;
       transcript.exchanges.push(observableExchange);
     }
+    console.log('done pushing transcript');
   });
 
   socket.on('update', function(exchange) {
