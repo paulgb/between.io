@@ -2,7 +2,7 @@ extends layout
 
 mixin renders(part, name, file)
   - var tabs = renderer(file)
-  if file.data
+  if file.data && file.data.length
     h3= name
     div(class='row')
       div(class='span6')

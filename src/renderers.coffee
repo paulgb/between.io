@@ -100,7 +100,7 @@ module.exports = class RenderManager
     renders = []
     links = []
     for renderer in @renderers
-      if renderer.canRender(file.contentType)
+      if renderer.canRender(file.contentType.split(';')[0])
         result = renderer.get(file)
         if result.content?
           renders.push(result)
