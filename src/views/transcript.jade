@@ -16,7 +16,7 @@ block content
         td(data-bind='text: method')
         td(data-bind='text: responseStatus')
         td(data-bind='text: path')
-        td(data-bind='text: responseHeaders && responseHeaders["Content-Type"].split(";")[0]')
+        td(data-bind='text: responseHeaders && responseHeaders["Content-Type"] && responseHeaders["Content-Type"].split(";")[0]')
         td(data-bind='text: responseHeaders && responseHeaders["Content-Length"]')
         td
           a(class='btn btn-mini btn-primary', data-bind='attr:{href:"/exchange/"+id}') view
