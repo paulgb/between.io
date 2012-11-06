@@ -17,12 +17,16 @@ interceptorSchema = new Schema
 exchangeSchema = new Schema
   method: String
   path: String
+  host: String
   requestHeaders: Mixed
   requestData: Schema.Types.ObjectId
   responseHeaders: Mixed
   responseStatus: Number
   responseData: Schema.Types.ObjectId
   interceptor: Schema.Types.ObjectId
+
+exchangeSchema.methods.reasonPhrase = ->
+  http.STATUS_CODES[@responseStatus]
 
 fileSchema = new Schema
   contentType: String

@@ -50,6 +50,7 @@ module.exports = (app) ->
       requestHeaders = caseHeaders requestHeaders
       @responseFilename = getFilename path, 'download'
       @exchange = new Exchange
+        host: host
         method: method
         path: path
         requestHeaders: requestHeaders

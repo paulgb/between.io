@@ -19,7 +19,7 @@ module.exports.listenTranscript = (transcriptId) ->
     for exchange in exchanges
       observableExchange = ko.observable exchange
       exchangeMap[exchange.id] = observableExchange
-      transcript.exchanges.push observableExchange
+      transcript.exchanges.unshift observableExchange
 
     console.log 'done pushing transcript'
 
@@ -27,9 +27,4 @@ module.exports.listenTranscript = (transcriptId) ->
     console.log exchange
     observableExchange = exchangeMap[exchange.id]
     observableExchange exchange
-
-  socket.on 'exchange', (exchange) ->
-    observableExchange = ko.observable exchange
-    transcript.exchanges.unshift observableExchange
-    exchangeMap[exchange.id] = observableExchange
 
