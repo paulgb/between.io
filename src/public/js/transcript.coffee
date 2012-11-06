@@ -24,6 +24,7 @@ module.exports.listenTranscript = (transcriptId) ->
     console.log 'done pushing transcript'
 
   socket.on 'update', (exchange) ->
+    console.log exchange
     observableExchange = exchangeMap[exchange.id]
     observableExchange exchange
 

@@ -1,7 +1,7 @@
 extends layout
 
 block head
-  meta(name='attach-transcript', value=#{interceptor.id})
+  meta(name='attach-transcript', content=interceptor.id)
 
 block content
   h1 #{interceptor.id}.#{settings['proxy host']} &rarr; #{interceptor.host}
