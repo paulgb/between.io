@@ -72,7 +72,6 @@ module.exports = (app) ->
       responseHeaders = caseHeaders responseHeaders
       @exchange.responseStatus = statusCode
       @exchange.responseHeaders = responseHeaders
-      @interceptor.updateExchange(@exchange)
 
       responseData = new File
         contentEncoding: responseHeaders['Content-Encoding']

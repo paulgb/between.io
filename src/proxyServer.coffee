@@ -30,6 +30,13 @@ exports.ProxyServer = class ProxyServer
     handleRequest = (server) => (req, res, proxy) =>
       exchange = new cls()
 
+      requestDataBuffer = []
+      requestEnded = false
+      req.on 'data', (chunk) ->
+        requestDataBuffer.push(chunk)
+      req.on 'end', ->
+        requestEnded = true
+
       exchange.getTarget req, server, (err, target) =>
         if err
           console.log "Error: #{err}"
@@ -63,6 +70,13 @@ exports.ProxyServer = class ProxyServer
             exchange.onRequestEnd()
 
         proxy.proxyRequest req, res, target
+
+        for chunk of requestDataBuffer
+          req.emit 'data', chunk
+
+        if requestEnded
+          req.emit 'end'
+
 
     for proxyTag, proxySettings of @servers
       do (proxyTag, proxySettings) ->
