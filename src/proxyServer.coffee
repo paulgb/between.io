@@ -30,38 +30,39 @@ exports.ProxyServer = class ProxyServer
     handleRequest = (server) => (req, res, proxy) =>
       exchange = new cls()
 
-      target = exchange.getTarget req, server
-      if not target?
-        res.writeHead(404)
-        res.end()
-        return
+      exchange.getTarget req, server, (err, target) =>
+        if err
+          console.log "Error: #{err}"
+          res.writeHead(404)
+          res.end()
+          return
 
-      exchange.onRequestWriteHead? req.method, req.url, req.headers
+        exchange.onRequestWriteHead? req.method, req.url, req.headers
 
-      res._oldEnd = res.end
-      res.end = =>
-        exchange.onResponseEnd?()
-        res._oldEnd()
+        res._oldEnd = res.end
+        res.end = =>
+          exchange.onResponseEnd?()
+          res._oldEnd()
 
-      res._oldWrite = res.write
-      res.write = (chunk) =>
-        exchange.onResponseWrite? chunk
-        res._oldWrite chunk
+        res._oldWrite = res.write
+        res.write = (chunk) =>
+          exchange.onResponseWrite? chunk
+          res._oldWrite chunk
 
-      res._oldWriteHead = res.writeHead
-      res.writeHead = (statusCode, headers) =>
-        exchange.onResponseWriteHead? statusCode, headers
-        res._oldWriteHead statusCode, headers
-      
-      req.on 'data', (chunk) ->
-        if exchange.onRequestWrite
-          exchange.onRequestWrite(chunk)
+        res._oldWriteHead = res.writeHead
+        res.writeHead = (statusCode, headers) =>
+          exchange.onResponseWriteHead? statusCode, headers
+          res._oldWriteHead statusCode, headers
+        
+        req.on 'data', (chunk) ->
+          if exchange.onRequestWrite
+            exchange.onRequestWrite(chunk)
 
-      req.on 'end', ->
-        if exchange.onRequestEnd
-          exchange.onRequestEnd()
+        req.on 'end', ->
+          if exchange.onRequestEnd
+            exchange.onRequestEnd()
 
-      proxy.proxyRequest req, res, target
+        proxy.proxyRequest req, res, target
 
     for proxyTag, proxySettings of @servers
       do (proxyTag, proxySettings) ->

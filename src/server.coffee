@@ -5,8 +5,6 @@ path = require 'path'
 
 app = express()
 
-models = require('./models')
-
 app.configure ->
   app.set 'port', process.env.PORT || 3000
   app.set 'proxy port', process.env.PROXY_PORT || 80
@@ -46,7 +44,7 @@ server.listen app.get('port'), ->
   
 socketio = require('socket.io').listen server
 
-require('./app')(app, socketio, models)
+require('./app')(app, socketio)
 
-require('./proxy')(app, models)
+require('./proxy')(app)
 

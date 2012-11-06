@@ -15,6 +15,7 @@
     "filesize": "*",
     "nodeunit": "*",
     "socket.io": "*",
-    "browserify": "*"
+    "browserify": "*",
+    "mongoose": "*"
   }
 }

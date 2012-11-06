@@ -2,7 +2,7 @@
 fs = require 'fs'
 
 {ProxyServer} = require('./proxyServer')
-{Interceptor} = require('./models')
+{Interceptor, Exchange, File} = require './models'
 
 getFilename = (path, def) ->
   if result = /([^\/]+)$/.exec(path)
@@ -10,7 +10,7 @@ getFilename = (path, def) ->
   else
     def
 
-module.exports = (app, models) ->
+module.exports = (app) ->
   getInterceptorIdFromHost = (host) ->
     hostbase = app.get 'proxy host'
     hregex = new RegExp("([\\d\\w]+)\\.#{hostbase}")
@@ -28,43 +28,45 @@ module.exports = (app, models) ->
     return newHeaders
 
   class BetweenProxy
-    getTarget: (req, server) ->
+    getTarget: (req, server, callback) ->
       req.headers = caseHeaders(req.headers)
       interId = getInterceptorIdFromHost req.headers.Host
-      @interceptor = models.interceptors.get interId
+      Interceptor.findById interId, (err, interceptor) =>
+        @interceptor = interceptor
+        if err
+          console.log err
+          callback(err)
 
-      if not @interceptor
-        return
-
-      req.headers.host = @interceptor.host
-      host = @interceptor.host
-      if server.https
-        port = 443
-      else
-        port = 80
-      {host, port}
+        req.headers.host = @interceptor.host
+        host = @interceptor.host
+        if server.https
+          port = 443
+        else
+          port = 80
+        callback undefined, {host, port}
 
     onRequestWriteHead: (method, path, requestHeaders) ->
       host = @interceptor.host
       requestHeaders = caseHeaders requestHeaders
-      @responseFilename = getFilename(path, 'download')
-      @exchange = models.exchanges.create {
-        method,
-        path,
-        host,
-        requestHeaders}
+      @responseFilename = getFilename path, 'download'
+      @exchange = new Exchange
+        method: method
+        path: path
+        requestHeaders: requestHeaders
+        interceptor: @interceptor.id
 
-      @interceptor.addExchange(@exchange)
-
-      requestData = models.files.create
+      requestData = new File
         contentEncoding: requestHeaders['Content-Encoding']
         contentType: requestHeaders['Content-Type']
         contentLength: requestHeaders['Content-Length']
         fileName: 'postdata.txt'
 
-      @exchange.requestData = requestData.id
-      @onRequestWrite = requestData.write
-      @onRequestEnd = requestData.end
+      requestData.save =>
+        @exchange.requestData = requestData.id
+        @exchange.save
+
+      #@onRequestWrite = requestData.write
+      #@onRequestEnd = requestData.end
      
     onResponseWriteHead: (statusCode, responseHeaders) ->
       responseHeaders = caseHeaders responseHeaders
@@ -72,15 +74,18 @@ module.exports = (app, models) ->
       @exchange.responseHeaders = responseHeaders
       @interceptor.updateExchange(@exchange)
 
-      responseData = models.files.create
+      responseData = new File
         contentEncoding: responseHeaders['Content-Encoding']
         contentType: responseHeaders['Content-Type']
         contentLength: responseHeaders['Content-Length']
         fileName: @responseFilename
 
-      @exchange.responseData = responseData.id
-      @onResponseWrite = responseData.write
-      @onResponseEnd = responseData.end
+      responseData.save =>
+        @exchange.responseData = responseData.id
+        @exchange.save()
+
+      #@onResponseWrite = responseData.write
+      #@onResponseEnd = responseData.end
 
   privateKey = fs.readFileSync(app.get('private key'), 'ascii')
   cert = fs.readFileSync(app.get('certificate'), 'ascii')
