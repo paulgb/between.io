@@ -23,6 +23,7 @@ app.configure ->
   app.use express.session()
   app.use app.router
   app.use require('less-middleware')({ src: __dirname + '/public' })
+  app.use require('browserify')(__dirname + '/public/js/client.coffee')
   app.use express.static(path.join(__dirname, 'public'))
 
   app.set 'proxy host', process.env.PROXY_HOST || 'between.io'
