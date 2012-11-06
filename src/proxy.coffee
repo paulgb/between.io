@@ -3,6 +3,7 @@ fs = require 'fs'
 
 {ProxyServer} = require('./proxyServer')
 {Interceptor, Exchange, File} = require './models'
+{FileBuffer} = require './fileBuffer'
 
 getFilename = (path, def) ->
   if result = /([^\/]+)$/.exec(path)
@@ -28,7 +29,7 @@ module.exports = (app) ->
     return newHeaders
 
   class BetweenProxy
-    getTarget: (req, server, callback) ->
+    getTarget: (req, server, callback) =>
       req.headers = caseHeaders(req.headers)
       interId = getInterceptorIdFromHost req.headers.Host
       Interceptor.findById interId, (err, interceptor) =>
@@ -45,7 +46,7 @@ module.exports = (app) ->
           port = 80
         callback undefined, {host, port}
 
-    onRequestWriteHead: (method, path, requestHeaders) ->
+    onRequestWriteHead: (method, path, requestHeaders) =>
       host = @interceptor.host
       requestHeaders = caseHeaders requestHeaders
       @responseFilename = getFilename path, 'download'
@@ -62,14 +63,20 @@ module.exports = (app) ->
         contentLength: requestHeaders['Content-Length']
         fileName: 'postdata.txt'
 
-      requestData.save =>
-        @exchange.requestData = requestData.id
-        @exchange.save
+      @exchange.save()
 
-      #@onRequestWrite = requestData.write
-      #@onRequestEnd = requestData.end
+      file = new FileBuffer(requestHeaders['Content-Length'])
+
+      file.on 'data', (data) =>
+        requestData.data = data
+        @exchange.requestData = requestData.id
+        requestData.save()
+        @exchange.save()
+
+      @onRequestWrite = file.write
+      @onRequestEnd = file.end
      
-    onResponseWriteHead: (statusCode, responseHeaders) ->
+    onResponseWriteHead: (statusCode, responseHeaders) =>
       responseHeaders = caseHeaders responseHeaders
       @exchange.responseStatus = statusCode
       @exchange.responseHeaders = responseHeaders
@@ -80,12 +87,18 @@ module.exports = (app) ->
         contentLength: responseHeaders['Content-Length']
         fileName: @responseFilename
 
-      responseData.save =>
+      @exchange.save()
+
+      file = new FileBuffer(responseHeaders['Content-Length'])
+
+      file.on 'data', (data) =>
+        responseData.data = data
         @exchange.responseData = responseData.id
+        responseData.save()
         @exchange.save()
 
-      #@onResponseWrite = responseData.write
-      #@onResponseEnd = responseData.end
+      @onResponseWrite = file.write
+      @onResponseEnd = file.end
 
   privateKey = fs.readFileSync(app.get('private key'), 'ascii')
   cert = fs.readFileSync(app.get('certificate'), 'ascii')

@@ -4,7 +4,7 @@ http = require 'http'
 {EventEmitter} = require 'events'
 mongoose = require 'mongoose'
 {Schema, Types} = mongoose
-{Buffer, Mixed} = Types
+{Mixed} = Types
 {Mixed} = Schema.Types
 
 db = mongoose.createConnection 'localhost', 'test'
@@ -33,7 +33,7 @@ fileSchema = new Schema
   contentEncoding: String
   contentLength: Number
   fileName: String
-  data: [Buffer]
+  data: Buffer
 
 module.exports =
   Interceptor: db.model 'Interceptor', interceptorSchema
