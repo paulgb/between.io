@@ -1,8 +1,8 @@
 extends layout
 
-mixin content(part, name, content)
-  - var tabs = renderer(content)
-  if content.status == 'done'
+mixin renders(part, name, file)
+  - var tabs = renderer(file)
+  if file.data
     h3= name
     div(class='row')
       div(class='span6')
@@ -43,6 +43,6 @@ block content
             td
               tt= val
 
-  //mixin content('request', 'Request Data', exchange.getRequestData())
-  //mixin content('response', 'Response Data', exchange.getResponseData())
+  mixin renders('request', 'Request Data', exchange.requestData)
+  mixin renders('response', 'Response Data', exchange.responseData)
 

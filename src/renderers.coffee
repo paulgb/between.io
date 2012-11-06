@@ -80,32 +80,6 @@ class SyntaxRenderer extends Renderer
     highlighted = highlight.highlightAuto(file.data.toString('ascii'))
     @renderTemplate({data: highlighted.value})
 
-class InfoRenderer extends Renderer
-  name: 'info'
-
-  canRender: -> true
-
-  renderTemplate: jade.compile(
-    '''
-    table(class='table table-bordered')
-      tr
-        th(style='width: 180px;') Type
-        td= file.getContentType()
-      tr
-        th Size
-        td= file.data.length
-      tr
-        th Raw Size
-        td= file.rawData.length
-      tr
-        th Download
-        td
-          a(href='/file/#{file.id}/#{file.fileName}') Download
-    ''')
-
-  render: (file) ->
-    @renderTemplate({file: file})
-
 module.exports = class RenderManager
   constructor: ->
     @renderers = [
@@ -113,20 +87,20 @@ module.exports = class RenderManager
       new ImageRenderer()
       new SyntaxRenderer()
       new RawRenderer()
-      new InfoRenderer()
       new RawLinker()
       new DownloadLinker()
     ]
 
   render: (file) =>
-    if not file.data?
-      return []
-    if file.data.length == 0
-      return []
+    if not file.data? or file.data.length == 0
+      return {
+        renders: []
+        links: []
+      }
     renders = []
     links = []
     for renderer in @renderers
-      if renderer.canRender(file.getContentType())
+      if renderer.canRender(file.contentType)
         result = renderer.get(file)
         if result.content?
           renders.push(result)

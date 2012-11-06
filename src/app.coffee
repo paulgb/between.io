@@ -20,8 +20,13 @@ module.exports = (app, socketio) ->
       res.render 'transcript', {interceptor}
 
   app.get '/exchange/:id', (req, res) ->
-    Exchange.findById req.params.id, (err, exchange) ->
-      res.render 'exchange', {exchange}
+    renderer = new RenderManager()
+    query = Exchange.findById req.params.id
+    query = query.populate 'requestData'
+    query = query.populate 'responseData'
+    query.exec (err, exchange) ->
+      console.log exchange
+      res.render 'exchange', {exchange, renderer: renderer.render}
     
   socketio.sockets.on 'connection', (socket) ->
     socket.on 'subscribe', (transcriptId) ->

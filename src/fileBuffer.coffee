@@ -1,8 +1,9 @@
 
 {EventEmitter} = require 'events'
+zlib = require 'zlib'
 
 class FileBuffer extends EventEmitter
-  constructor: (@contentLength) ->
+  constructor: (@contentLength, @contentEncoding) ->
     @chunks = []
     @lenProcessed = 0
 
@@ -23,6 +24,7 @@ class FileBuffer extends EventEmitter
       if @contentEncoding == 'gzip'
         zlib.gunzip rawData, (err, data) =>
           if err
+            console.log 'gzip error-----------------------------------------'
             @emit('error', "gzip error #{err}")
           else
             @emit('data', data)

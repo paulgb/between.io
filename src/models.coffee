@@ -19,11 +19,11 @@ exchangeSchema = new Schema
   path: String
   host: String
   requestHeaders: Mixed
-  requestData: Schema.Types.ObjectId
+  requestData: {type: Schema.Types.ObjectId, ref: 'File'}
   responseHeaders: Mixed
-  responseStatus: Number
-  responseData: Schema.Types.ObjectId
-  interceptor: Schema.Types.ObjectId
+  responseStatus: {type: String, default: null}
+  responseData: {type: Schema.Types.ObjectId, ref: 'File'}
+  interceptor: {type: Schema.Types.ObjectId, ref: 'Interceptor'}
 
 exchangeSchema.methods.reasonPhrase = ->
   http.STATUS_CODES[@responseStatus]

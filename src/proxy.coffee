@@ -65,7 +65,8 @@ module.exports = (app) ->
 
       @exchange.save()
 
-      file = new FileBuffer(requestHeaders['Content-Length'])
+      file = new FileBuffer(requestHeaders['Content-Length'],
+        requestHeaders['Content-Encoding'])
 
       file.on 'data', (data) =>
         requestData.data = data
@@ -89,7 +90,8 @@ module.exports = (app) ->
 
       @exchange.save()
 
-      file = new FileBuffer(responseHeaders['Content-Length'])
+      file = new FileBuffer(responseHeaders['Content-Length'],
+        responseHeaders['Content-Encoding'])
 
       file.on 'data', (data) =>
         responseData.data = data
