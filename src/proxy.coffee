@@ -33,10 +33,11 @@ module.exports = (app) ->
       req.headers = caseHeaders(req.headers)
       interId = getInterceptorIdFromHost req.headers.Host
       Interceptor.findById interId, (err, interceptor) =>
-        @interceptor = interceptor
-        if err
+        if err? or not interceptor?
           console.log err
           callback(err)
+
+        @interceptor = interceptor
 
         req.headers.host = @interceptor.host
         host = @interceptor.host
