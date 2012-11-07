@@ -1,5 +1,6 @@
 
 Types = require 'mongoose'
+url = require 'url'
 
 RenderManager = require './renderers'
 contentTypes = require './contentTypes'
@@ -41,9 +42,23 @@ module.exports = (app, socketio) ->
     res.render 'index', {}
 
   app.post '/new', (req, res) ->
+    iUrl = req.body.url
+    if iUrl.indexOf('://') == -1
+      iUrl = 'http://' + iUrl
+    {protocol, port, hostname} = url.parse(iUrl)
+    if protocol == 'http:' and port?
+      httpPort = parseInt(port)
+    else
+      httpPort = 80
+    if protocol == 'https:' and port?
+      httpsPort = parseInt(port)
+    else
+      httpsPort = 443
     interceptor = new Interceptor
       _id: idAllocator.take()
-      host: req.body.host
+      host: hostname
+      httpPort: httpPort
+      httpsPort: httpsPort
 
     console.log 'her1', interceptor
     interceptor.save ->

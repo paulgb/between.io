@@ -41,9 +41,10 @@ module.exports = (app) ->
         req.headers.host = @interceptor.host
         host = @interceptor.host
         if server.https
-          port = 443
+          port = @interceptor.httpsPort
         else
-          port = 80
+          port = @interceptor.httpPort
+        console.log 'port: ', port
         callback undefined, {host, port}
 
     onRequestWriteHead: (method, path, requestHeaders) =>

@@ -1,13 +1,17 @@
 extends layout
 
 block content
-  h1 between.io
+  h1 Interceptor URLs
   p
-    | Enter the 
-    strong hostname 
-    | of an API server to get started
+    strong Interceptor URLs 
+    | wrap your HTTP and HTTPS requests so you can stop guessing what's on the wire.
+    | It's like a URL shortener with 
+    strong magic
+    | !
+  p
+    | Enter a URL you would like to wrap below.
   form(method='POST', action='/new')
     div(class='input-append')
-      input(class='span7', size=16, type='text', placeholder='graph.facebook.com', name='host')
+      input(class='span7', size=16, type='text', placeholder='graph.facebook.com', name='url')
       input(class='btn btn-primary span1', size=16, type='submit', value='go')
 

@@ -50,6 +50,8 @@ module.exports = (app) ->
   interceptorSchema = new Schema
     _id: String
     host: String
+    httpPort: Number
+    httpsPort: Number
 
   exchangePipeSchema = new Schema
     exchange: {type: String, ref: 'Exchange'}
