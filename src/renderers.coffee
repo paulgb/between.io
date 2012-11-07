@@ -16,6 +16,29 @@ class Renderer
   canRender: (contentType) ->
     contentTypes.matchType(contentType, @contentTypes)
 
+class InfoRenderer extends Renderer
+  name: 'info'
+
+  canRender: -> true
+
+  renderTemplate: jade.compile(
+    '''
+    table(class='table table-bordered')
+      tr
+        th(style='width: 180px;') Type
+        td= file.contentType
+      tr
+        th Size
+        td= file.data.length
+      tr
+        th Download
+        td
+          a(href='/file/#{file.id}/#{file.fileName}') Download
+    ''')
+
+  render: (file) ->
+    @renderTemplate({file: file})
+
 class Linker extends Renderer
   get: (file) ->
     name: @name
@@ -87,6 +110,7 @@ module.exports = class RenderManager
       new ImageRenderer()
       new SyntaxRenderer()
       new RawRenderer()
+      new InfoRenderer()
       new RawLinker()
       new DownloadLinker()
     ]
