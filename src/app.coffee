@@ -7,6 +7,36 @@ contentTypes = require './contentTypes'
 
 module.exports = (app, socketio) ->
   {Interceptor, Exchange, ExchangePipe, File, idAllocator} = app.models
+  fileGetter = (types, headerMods = []) ->
+    (req, res) ->
+      file = File.findById req.params.id, (err, file) ->
+        if err?
+          res.writeHead(404)
+          res.write('File not found')
+          res.end()
+        else if contentTypes.matchType(file.contentType, types)
+          headers =
+            'Content-Type': file.contentType
+            'Content-Length': file.data.length
+            'Connection': 'close'
+          for header, value of headerMods
+            headers[header] = value
+          res.writeHead(200, headers)
+          res.write(file.data)
+          res.end()
+        else
+          res.writeHead(403)
+          res.write('Wrong file type for this operation')
+          res.end()
+
+  app.get '/raw/:id/:filename', fileGetter contentTypes.plaintextTypes,
+    'Content-Type': 'text/plain'
+
+  app.get '/image/:id/:filename', fileGetter contentTypes.imageTypes
+
+  app.get '/file/:id/:filename', fileGetter contentTypes.allTypes,
+    'Content-Disposition': 'attachment'
+    
   app.get '/', (req, res) ->
     res.render 'index', {}
 
