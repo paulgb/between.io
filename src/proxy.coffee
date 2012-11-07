@@ -63,6 +63,7 @@ module.exports = (app) ->
         contentLength: requestHeaders['Content-Length']
         fileName: 'postdata.txt'
 
+      @exchange.requestData = requestData.id
       @exchange.save()
 
       file = new FileBuffer(requestHeaders['Content-Length'],
@@ -70,9 +71,7 @@ module.exports = (app) ->
 
       file.on 'data', (data) =>
         requestData.data = data
-        @exchange.requestData = requestData.id
         requestData.save()
-        @exchange.save()
 
       @onRequestWrite = file.write
       @onRequestEnd = file.end
@@ -88,6 +87,7 @@ module.exports = (app) ->
         contentLength: responseHeaders['Content-Length']
         fileName: @responseFilename
 
+      @exchange.responseData = responseData.id
       @exchange.save()
 
       file = new FileBuffer(responseHeaders['Content-Length'],
@@ -95,9 +95,7 @@ module.exports = (app) ->
 
       file.on 'data', (data) =>
         responseData.data = data
-        @exchange.responseData = responseData.id
         responseData.save()
-        @exchange.save()
 
       @onResponseWrite = file.write
       @onResponseEnd = file.end

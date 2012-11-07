@@ -17,14 +17,13 @@ module.exports.listenTranscript = (transcriptId) ->
   socket.on 'transcript', (exchanges) ->
     console.log "got transcript, #{exchanges.length} exchanges"
     for exchange in exchanges
-      observableExchange = ko.observable exchange
-      exchangeMap[exchange.id] = observableExchange
-      transcript.exchanges.unshift observableExchange
+      if exchangeMap[exchange._id]?
+        observableExchange = exchangeMap[exchange._id]
+        observableExchange exchange
+      else
+        observableExchange = ko.observable exchange
+        exchangeMap[exchange._id] = observableExchange
+        transcript.exchanges.unshift observableExchange
 
     console.log 'done pushing transcript'
-
-  socket.on 'update', (exchange) ->
-    console.log exchange
-    observableExchange = exchangeMap[exchange.id]
-    observableExchange exchange
 
