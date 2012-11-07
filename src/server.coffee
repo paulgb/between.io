@@ -43,6 +43,7 @@ server.listen app.get('port'), ->
   console.log "Express server listening on port " + app.get('port')
   
 socketio = require('socket.io').listen server
+socketio.set 'log level', 2
 
 require('./app')(app, socketio)
 

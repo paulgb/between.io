@@ -27,7 +27,6 @@ module.exports = (app, socketio) ->
     query = query.populate 'requestData'
     query = query.populate 'responseData'
     query.exec (err, exchange) ->
-      console.log exchange
       res.render 'exchange', {exchange, renderer: renderer.render}
     
   subscriptionManager = new SubscriptionManager (exchange, socket) ->
@@ -36,21 +35,17 @@ module.exports = (app, socketio) ->
   exchangeStream = ExchangePipe.find().populate('exchange').tailable().stream()
   
   exchangeStream.on 'data', (data) ->
-    console.log data
     subscriptionManager.notify(data.interceptor, data.exchange)
 
   socketio.sockets.on 'connection', (socket) ->
-    console.log socket
     socket.on 'subscribe', (transcriptId) ->
       console.log "got subscribe request for #{transcriptId}"
       subscriptionManager.sub(transcriptId, socket.id, socket)
 
-      ###
       query = Exchange.find({interceptor: transcriptId})
       query = query.limit(30).sort('-_id').exec (err, exchanges) ->
         if exchanges.length > 0
-          socket.emit 'transcript', exchanges
-      ###
+          socket.emit 'transcript', exchanges.reverse()
 
       socket.on 'disconnect', ->
         subscriptionManager.unsub(transcriptId, socket.id)
