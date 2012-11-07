@@ -11,6 +11,7 @@ app.configure ->
   app.set 'proxy https port', process.env.PROXY_HTTPS_PORT || 443
   app.set 'private key', process.env.PRIVATE_KEY || 'testkeys/key.pem'
   app.set 'certificate', process.env.CERTIFICATE || 'testkeys/wildcard.crt'
+  app.set 'mongodb host', process.env.MONGODB_HOST || 'mongodb://localhost/between'
   app.set 'views', __dirname + '/views'
   app.set 'view engine', 'jade'
   app.use express.favicon()
@@ -25,6 +26,8 @@ app.configure ->
   app.use express.static(path.join(__dirname, 'public'))
 
   app.set 'proxy host', process.env.PROXY_HOST || 'between.io'
+
+app.models = require('./models.coffee')(app)
 
 if process.env.AUTH_USER?
   app.get '/healthcheck', (req, res) ->

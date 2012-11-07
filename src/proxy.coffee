@@ -2,7 +2,6 @@
 fs = require 'fs'
 
 {ProxyServer} = require('./proxyServer')
-{Interceptor, Exchange, File} = require './models'
 {FileBuffer} = require './fileBuffer'
 
 getFilename = (path, def) ->
@@ -12,6 +11,7 @@ getFilename = (path, def) ->
     def
 
 module.exports = (app) ->
+  {Interceptor, Exchange, File} = app.models
   getInterceptorIdFromHost = (host) ->
     hostbase = app.get 'proxy host'
     hregex = new RegExp("([\\d\\w]+)\\.#{hostbase}")
@@ -33,6 +33,7 @@ module.exports = (app) ->
       req.headers = caseHeaders(req.headers)
       interId = getInterceptorIdFromHost req.headers.Host
       Interceptor.findById interId, (err, interceptor) =>
+        console.log interceptor
         @interceptor = interceptor
         if err
           console.log err

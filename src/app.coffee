@@ -3,10 +3,10 @@ Types = require 'mongoose'
 
 RenderManager = require './renderers'
 contentTypes = require './contentTypes'
-{Interceptor, Exchange, ExchangePipe, File} = require './models'
 {SubscriptionManager} = require './subscriptionManager'
 
 module.exports = (app, socketio) ->
+  {Interceptor, Exchange, ExchangePipe, File} = app.models
   app.get '/', (req, res) ->
     res.render 'index', {}
 
