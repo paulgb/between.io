@@ -6,16 +6,18 @@ contentTypes = require './contentTypes'
 {SubscriptionManager} = require './subscriptionManager'
 
 module.exports = (app, socketio) ->
-  {Interceptor, Exchange, ExchangePipe, File} = app.models
+  {Interceptor, Exchange, ExchangePipe, File, idAllocator} = app.models
   app.get '/', (req, res) ->
     res.render 'index', {}
 
   app.post '/new', (req, res) ->
     interceptor = new Interceptor
+      _id: idAllocator.take()
       host: req.body.host
 
+    console.log 'her1', interceptor
     interceptor.save ->
-      res.redirect "/transcript/#{interceptor.id}/"
+      res.redirect "/transcript/#{interceptor._id}/"
 
   app.get '/transcript/:id', (req, res) ->
     Interceptor.findById req.params.id, (err, interceptor) ->
@@ -44,6 +46,10 @@ module.exports = (app, socketio) ->
 
       query = Exchange.find({interceptor: transcriptId})
       query = query.limit(30).sort('-_id').exec (err, exchanges) ->
+        if err
+          console.log "mongo error: #{err}"
+          return
+          
         if exchanges.length > 0
           socket.emit 'transcript', exchanges.reverse()
 

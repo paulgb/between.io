@@ -11,7 +11,7 @@ getFilename = (path, def) ->
     def
 
 module.exports = (app) ->
-  {Interceptor, Exchange, File} = app.models
+  {Interceptor, Exchange, File, idAllocator} = app.models
   getInterceptorIdFromHost = (host) ->
     hostbase = app.get 'proxy host'
     hregex = new RegExp("([\\d\\w]+)\\.#{hostbase}")
@@ -33,7 +33,6 @@ module.exports = (app) ->
       req.headers = caseHeaders(req.headers)
       interId = getInterceptorIdFromHost req.headers.Host
       Interceptor.findById interId, (err, interceptor) =>
-        console.log interceptor
         @interceptor = interceptor
         if err
           console.log err
@@ -52,6 +51,7 @@ module.exports = (app) ->
       requestHeaders = caseHeaders requestHeaders
       @responseFilename = getFilename path, 'download'
       @exchange = new Exchange
+        _id: idAllocator.take()
         host: host
         method: method
         path: path
@@ -59,6 +59,7 @@ module.exports = (app) ->
         interceptor: @interceptor.id
 
       requestData = new File
+        _id: idAllocator.take()
         contentEncoding: requestHeaders['Content-Encoding']
         contentType: requestHeaders['Content-Type']
         contentLength: requestHeaders['Content-Length']
@@ -83,6 +84,7 @@ module.exports = (app) ->
       @exchange.responseHeaders = responseHeaders
 
       responseData = new File
+        _id: idAllocator.take()
         contentEncoding: responseHeaders['Content-Encoding']
         contentType: responseHeaders['Content-Type']
         contentLength: responseHeaders['Content-Length']
