@@ -12,6 +12,8 @@ app.configure ->
   app.set 'private key', process.env.PRIVATE_KEY || 'testkeys/key.pem'
   app.set 'certificate', process.env.CERTIFICATE || 'testkeys/wildcard.crt'
   app.set 'mongodb host', process.env.MONGODB_HOST || 'mongodb://localhost/between'
+  app.set 'id bunch size', process.env.ID_BUNCH_SIZE || 10
+  app.set 'id min allocated', process.env.ID_MIN_ALLOCATED || 5
   app.set 'views', __dirname + '/views'
   app.set 'view engine', 'jade'
   app.use express.favicon()

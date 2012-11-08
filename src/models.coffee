@@ -24,8 +24,8 @@ module.exports = (app) ->
 
   class IdAllocator
     constructor: ->
-      @bunchSize = 10
-      @minAllocated = 5
+      @bunchSize = parseInt(app.get 'id bunch size')
+      @minAllocated = parseInt(app.get 'id min allocated')
       @namespace = 'main'
       @allocated = []
       @preAllocate()
@@ -33,8 +33,12 @@ module.exports = (app) ->
     preAllocate: =>
       IdAllocatorMeta.findOneAndUpdate {_id: @namespace},
         {$inc: {maxAllocated: @bunchSize}},
-        {upsert: true},
+        {upsert: true, new: false},
         (err, allocatorMeta) =>
+          if err?
+              console.log "Allocation error! #{err}"
+              return
+          console.log allocatorMeta
           start = allocatorMeta.maxAllocated
           end = allocatorMeta.maxAllocated + @bunchSize
           @allocated = @allocated.concat([start...end])
@@ -43,7 +47,9 @@ module.exports = (app) ->
     take: =>
       if @allocated.length <= @minAllocated
         setTimeout @preAllocate, 0
-      @allocated.shift().toString(ALPHANUM_RADIX)
+      r = @allocated.shift().toString(ALPHANUM_RADIX)
+      console.log "Giving ID #{r}"
+      r
 
   idAllocator = new IdAllocator()
 
