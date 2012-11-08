@@ -4,7 +4,6 @@ class SubscriptionManager
     @listeners = {}
 
   notify: (listenId, message) ->
-    #console.log "Notify, #{listenId}"
     if not @listeners[listenId]?
       return
     for handlerId, handler of @listeners[listenId]

@@ -8,5 +8,5 @@ fi
 
 npm install
 
-authbind node app.js
+forever app.js
 

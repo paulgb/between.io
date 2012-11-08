@@ -33,9 +33,11 @@ module.exports = (app) ->
       req.headers = caseHeaders(req.headers)
       interId = getInterceptorIdFromHost req.headers.Host
       Interceptor.findById interId, (err, interceptor) =>
-        if err? or not interceptor?
+        if err?
           console.log err
           callback(err)
+        if not interceptor?
+          callback "No interceptor for id #{interId}"
 
         @interceptor = interceptor
 
@@ -45,7 +47,6 @@ module.exports = (app) ->
           port = @interceptor.httpsPort
         else
           port = @interceptor.httpPort
-        console.log 'port: ', port
         callback undefined, {host, port}
 
     onRequestWriteHead: (method, path, requestHeaders) =>
