@@ -39,6 +39,7 @@ module.exports = (app, socketio) ->
     'Content-Disposition': 'attachment'
     
   app.get '/', (req, res) ->
+    console.log req.user
     res.render 'index', {}
 
   app.post '/new', (req, res) ->

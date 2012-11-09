@@ -46,7 +46,7 @@ module.exports = (app) ->
 
     take: =>
       if @allocated.length <= @minAllocated
-        setTimeout @preAllocate, 0
+        process.nextTick @preAllocate
       r = @allocated.shift().toString(ALPHANUM_RADIX)
       console.log "Giving ID #{r}"
       r

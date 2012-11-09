@@ -16,6 +16,9 @@
     "nodeunit": "*",
     "socket.io": "*",
     "browserify": "*",
-    "mongoose": "*"
+    "mongoose": "*",
+    "passport": "*",
+    "passport-dailycred": "*",
+    "connect-mongo": "*"
   }
 }

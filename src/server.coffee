@@ -3,48 +3,74 @@ express = require 'express'
 http = require 'http'
 path = require 'path'
 
+passport = require 'passport'
+DailyCredStrategy = require('passport-dailycred').Strategy
+
+MongoStore = require('connect-mongo')(express)
+
 app = express()
 
-app.configure ->
-  app.set 'port', process.env.PORT || 3000
-  app.set 'proxy port', process.env.PROXY_PORT || 80
-  app.set 'proxy https port', process.env.PROXY_HTTPS_PORT || 443
-  app.set 'private key', process.env.PRIVATE_KEY || 'testkeys/key.pem'
-  app.set 'certificate', process.env.CERTIFICATE || 'testkeys/wildcard.crt'
-  app.set 'mongodb host', process.env.MONGODB_HOST || 'mongodb://localhost/between'
-  app.set 'id bunch size', process.env.ID_BUNCH_SIZE || 10
-  app.set 'id min allocated', process.env.ID_MIN_ALLOCATED || 5
-  app.set 'views', __dirname + '/views'
-  app.set 'view engine', 'jade'
-  app.use express.favicon()
-  app.use express.logger('dev')
-  app.use express.bodyParser()
-  app.use express.methodOverride()
-  app.use express.cookieParser('c374b67c4cd99a6ef1ccfcca2aeb93ff')
-  app.use express.session()
-  app.use app.router
-  app.use require('less-middleware')({ src: __dirname + '/public' })
-  app.use require('browserify')(__dirname + '/public/js/client.coffee')
-  app.use express.static(path.join(__dirname, 'public'))
+app.set 'port', process.env.PORT || 3000
+app.set 'proxy host', process.env.PROXY_HOST || 'between.io'
+app.set 'proxy port', process.env.PROXY_PORT || 80
+app.set 'proxy https port', process.env.PROXY_HTTPS_PORT || 443
+app.set 'private key', process.env.PRIVATE_KEY || 'testkeys/key.pem'
+app.set 'certificate', process.env.CERTIFICATE || 'testkeys/wildcard.crt'
+app.set 'mongodb host', process.env.MONGODB_HOST || 'mongodb://localhost/between'
+app.set 'id bunch size', process.env.ID_BUNCH_SIZE || 10
+app.set 'id min allocated', process.env.ID_MIN_ALLOCATED || 5
+app.set 'dailycred client id', process.env.DAILYCRED_CLIENT_ID
+app.set 'dailycred secret', process.env.DAILYCRED_SECRET
+app.set 'client host', process.env.CLIENT_HOST
+app.set 'dailycred callback', "http://#{app.get('client host')}/auth"
+app.set 'views', __dirname + '/views'
+app.set 'view engine', 'jade'
+app.use express.favicon()
+app.use express.logger('dev')
+app.use express.bodyParser()
+app.use express.methodOverride()
+app.use express.cookieParser('c374b67c4cd99a6ef1ccfcca2aeb93ff')
+app.use express.session
+  secret: '0afe64dbf1ab51bf133843767797e523'
+  store: new MongoStore
+    url: app.get 'mongodb host'
+app.use require('less-middleware')({ src: __dirname + '/public' })
+app.use require('browserify')(__dirname + '/public/js/client.coffee')
 
-  app.set 'proxy host', process.env.PROXY_HOST || 'between.io'
+passport.serializeUser (user, done) ->
+  done(null, user)
 
-app.models = require('./models.coffee')(app)
+passport.deserializeUser (obj, done) ->
+  done(null, obj)
 
-if process.env.AUTH_USER?
-  app.get '/healthcheck', (req, res) ->
-      res.writeHead(200)
-      res.end()
+passport.use(new DailyCredStrategy {
+  clientID: app.get 'dailycred client id'
+  clientSecret: app.get 'dailycred secret'
+  callbackURL: app.get 'dailycred callback'
+  }, (accessToken, refreshToken, profile, done) ->
+    done(null, profile))
 
-  app.get '/googleed106e19283bb2cc.html', (req, res) ->
-      res.writeHead(200)
-      res.end('google-site-verification: googled0582ab45aea5431.html\n')
-
-  auth = express.basicAuth process.env.AUTH_USER, process.env.AUTH_PASS
-  app.get '/', auth, (req, res, next) -> next()
+app.use passport.initialize()
+app.use passport.session()
 
 app.configure 'development', ->
   app.use express.errorHandler()
+
+app.use app.router
+app.use express.static(path.join(__dirname, 'public'))
+
+app.get '/login', passport.authenticate('dailycred'), ->
+
+app.get '/auth', passport.authenticate('dailycred',
+  {failureRedirect: '/login'}),
+  (req, res) ->
+    res.redirect('/')
+
+app.get '/logout', (req, res) ->
+  req.logout()
+  req.redirect('/')
+
+app.models = require('./models.coffee')(app)
 
 server = http.createServer(app)
 
@@ -57,4 +83,5 @@ socketio.set 'log level', 2
 require('./app')(app, socketio)
 
 require('./proxy')(app)
+
 

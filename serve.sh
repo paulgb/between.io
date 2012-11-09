@@ -8,5 +8,10 @@ fi
 
 npm install
 
-forever app.js
+if [ "$NODE_ENV" == "production" ]
+then
+  forever app.js
+else
+  authbind node app.js
+fi
 
