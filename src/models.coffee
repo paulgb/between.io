@@ -58,6 +58,10 @@ module.exports = (app) ->
     host: String
     httpPort: Number
     httpsPort: Number
+    user: String
+
+  interceptorSchema.methods.getProxyHost = ->
+    "#{@_id}.#{app.get 'proxy host'}"
 
   exchangePipeSchema = new Schema
     exchange: {type: String, ref: 'Exchange'}
@@ -83,6 +87,7 @@ module.exports = (app) ->
     responseStatus: type: String
     responseData: {type: String, ref: 'File'}
     interceptor: {type: String, ref: 'Interceptor'}
+    user: String
 
   exchangeSchema.methods.reasonPhrase = ->
     http.STATUS_CODES[@responseStatus]
@@ -100,6 +105,7 @@ module.exports = (app) ->
     contentLength: Number
     fileName: String
     data: Buffer
+    user: String
 
   return {
     Interceptor: db.model 'Interceptor', interceptorSchema

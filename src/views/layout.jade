@@ -14,14 +14,21 @@ html
     div(class='navbar navbar-static-top')
       div(class='navbar-inner')
         a(class='brand', href='/') between.io
-        ul(class='nav')
-          li(class='divider-vertical')
-          li
-            a(href='#') Docs
-          li(class='divider-vertical')
-          li
-            a(href='#') Blog
-          li(class='divider-vertical')
+        
+        ul(class='nav pull-right')
+          if user
+            li(class='dropdown')
+              a(class='dropdown-toggle', data-toggle='dropdown', href='#')
+                | Logged in as 
+                strong= user.email
+                b(class='caret')
+              ul(class='dropdown-menu')
+                li
+                  a(href='/logout') Log Out
+          else
+            li
+              a(href='/login') Log In
+            
     div(class='container')
       block content
     script(type='text/javascript')

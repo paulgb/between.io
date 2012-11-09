@@ -4,14 +4,13 @@ block head
   meta(name='attach-transcript', content=interceptor.id)
 
 block content
-  - var interUrl = interceptor.id + '.' + settings['proxy host']
-  h1 #{interUrl} &rarr; #{interceptor.host}
+  h1 #{interceptor.getProxyHost()} &rarr; #{interceptor.host}
 
   // ko ifnot: exchanges().length > 0 
   p Your interceptor URL has been created! Simply replace 
     samp= interceptor.host 
     |  with 
-    samp= interUrl 
+    samp= interceptor.getProxyHost()
     |  in your code to start tracking requests. 
     | Request data will appear here once it starts to come in.
     | HTTP and HTTPS requests will work.

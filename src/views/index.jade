@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  h1 Interceptor URLs
+  h2 Create Interceptor
   p
     strong Interceptor URLs 
     | wrap your HTTP and HTTPS requests so you can stop guessing what's on the wire.
@@ -15,3 +15,14 @@ block content
       input(class='span7', size=16, type='text', placeholder='graph.facebook.com', name='url')
       input(class='btn btn-primary span1', size=16, type='submit', value='go')
 
+  if interceptors.length > 0
+    h2 Existing Interceptors
+    div(class='row')
+      div(class='span7')
+        table(class='table table-striped')
+          each interceptor in interceptors
+            tr
+              td #{interceptor.getProxyHost()} &rarr; #{interceptor.host}
+              td(style='width: 36px;')
+                a(class='btn btn-mini btn-primary', href='/transcript/#{interceptor._id}')
+                  | view

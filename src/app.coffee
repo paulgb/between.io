@@ -6,6 +6,11 @@ RenderManager = require './renderers'
 contentTypes = require './contentTypes'
 {SubscriptionManager} = require './subscriptionManager'
 
+ensureAuthenticated = (req, res, next) ->
+  if (req.isAuthenticated())
+    return next()
+  res.redirect '/login'
+
 module.exports = (app, socketio) ->
   {Interceptor, Exchange, ExchangePipe, File, idAllocator} = app.models
   fileGetter = (types, headerMods = []) ->
@@ -39,10 +44,13 @@ module.exports = (app, socketio) ->
     'Content-Disposition': 'attachment'
     
   app.get '/', (req, res) ->
-    console.log req.user
-    res.render 'index', {}
+    if req.user?
+      Interceptor.find {user: req.user.id}, (err, interceptors) ->
+        res.render 'index', {interceptors}
+    else
+      res.render 'landing'
 
-  app.post '/new', (req, res) ->
+  app.post '/new', ensureAuthenticated, (req, res) ->
     iUrl = req.body.url
     if iUrl.indexOf('://') == -1
       iUrl = 'http://' + iUrl
@@ -60,13 +68,17 @@ module.exports = (app, socketio) ->
       host: hostname
       httpPort: httpPort
       httpsPort: httpsPort
+      user: req.user.id
 
-    console.log 'her1', interceptor
     interceptor.save ->
       res.redirect "/transcript/#{interceptor._id}/"
 
   app.get '/transcript/:id', (req, res) ->
     Interceptor.findById req.params.id, (err, interceptor) ->
+      if not interceptor?
+        return res.render 'notfound'
+      if req.user.id isnt interceptor.user
+        return res.render 'baduser'
       res.render 'transcript', {interceptor}
 
   app.get '/exchange/:id', (req, res) ->
@@ -75,6 +87,10 @@ module.exports = (app, socketio) ->
     query = query.populate 'requestData'
     query = query.populate 'responseData'
     query.exec (err, exchange) ->
+      if not exchange?
+        return res.render 'notfound'
+      if req.user.id isnt exchange.user
+        return res.render 'baduser'
       res.render 'exchange', {exchange, renderer: renderer.render}
     
   subscriptionManager = new SubscriptionManager (exchange, socket) ->

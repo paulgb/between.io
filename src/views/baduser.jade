@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  h1 Wrong User
+  p You are not authorized to view this content.
+  if user
+    a(class='btn', href='/logout') Log Out
+  else
+    a(class='btn', href='/login') Log In
+

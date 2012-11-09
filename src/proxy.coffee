@@ -63,6 +63,7 @@ module.exports = (app) ->
         path: path
         requestHeaders: requestHeaders
         interceptor: @interceptor.id
+        user: @interceptor.user
 
       requestData = new File
         _id: idAllocator.take()
@@ -70,6 +71,7 @@ module.exports = (app) ->
         contentType: requestHeaders['Content-Type']
         contentLength: requestHeaders['Content-Length']
         fileName: 'postdata.txt'
+        user: @interceptor.user
 
       @exchange.requestData = requestData.id
       @exchange.save()
@@ -95,6 +97,7 @@ module.exports = (app) ->
         contentType: responseHeaders['Content-Type']
         contentLength: responseHeaders['Content-Length']
         fileName: @responseFilename
+        user: @interceptor.user
 
       @exchange.responseData = responseData.id
       @exchange.save()

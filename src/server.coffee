@@ -39,10 +39,11 @@ app.use require('less-middleware')({ src: __dirname + '/public' })
 app.use require('browserify')(__dirname + '/public/js/client.coffee')
 
 passport.serializeUser (user, done) ->
-  done(null, user)
+  done null, "#{user.email};#{user.id}"
 
-passport.deserializeUser (obj, done) ->
-  done(null, obj)
+passport.deserializeUser (userStr, done) ->
+  [email, id] = userStr.split ';'
+  done null, {email, id}
 
 passport.use(new DailyCredStrategy {
   clientID: app.get 'dailycred client id'
@@ -53,6 +54,10 @@ passport.use(new DailyCredStrategy {
 
 app.use passport.initialize()
 app.use passport.session()
+
+app.use (req, res, next) ->
+  res.locals.user = req.user
+  next()
 
 app.configure 'development', ->
   app.use express.errorHandler()
