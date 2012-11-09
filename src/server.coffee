@@ -16,6 +16,7 @@ app.set 'proxy port', process.env.PROXY_PORT || 80
 app.set 'proxy https port', process.env.PROXY_HTTPS_PORT || 443
 app.set 'private key', process.env.PRIVATE_KEY || 'testkeys/key.pem'
 app.set 'certificate', process.env.CERTIFICATE || 'testkeys/wildcard.crt'
+app.set 'intermediate cert', process.env.INTERMEDIATE_CERT
 app.set 'mongodb host', process.env.MONGODB_HOST || 'mongodb://localhost/between'
 app.set 'id bunch size', process.env.ID_BUNCH_SIZE || 10
 app.set 'id min allocated', process.env.ID_MIN_ALLOCATED || 5
@@ -68,7 +69,7 @@ app.get '/auth', passport.authenticate('dailycred',
 
 app.get '/logout', (req, res) ->
   req.logout()
-  req.redirect('/')
+  res.redirect('/')
 
 app.models = require('./models.coffee')(app)
 

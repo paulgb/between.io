@@ -111,6 +111,10 @@ module.exports = (app) ->
 
   privateKey = fs.readFileSync(app.get('private key'), 'ascii')
   cert = fs.readFileSync(app.get('certificate'), 'ascii')
+  if app.get('intermediate cert')
+    ic = [fs.readFileSync(app.get('intermediate cert'), 'ascii')]
+  else
+    ic = []
   servers =
     http:
       port: app.get 'proxy port'
@@ -121,5 +125,6 @@ module.exports = (app) ->
       https:
         key: privateKey
         cert: cert
+        ca: ic
   new ProxyServer(BetweenProxy, servers)
 
