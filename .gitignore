@@ -2,4 +2,6 @@ style.css
 node_modules
 .*.swp
 config.sh
+keys.tar.gz
+keys
 
