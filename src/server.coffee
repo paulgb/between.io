@@ -36,6 +36,10 @@ if process.env.AUTH_USER?
       res.writeHead(200)
       res.end()
 
+  app.get '/googleed106e19283bb2cc.html', (req, res) ->
+      res.writeHead(200)
+      res.end('google-site-verification: googled0582ab45aea5431.html\n')
+
   auth = express.basicAuth process.env.AUTH_USER, process.env.AUTH_PASS
   app.get '/', auth, (req, res, next) -> next()
 

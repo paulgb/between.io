@@ -36,9 +36,12 @@ module.exports = (app) ->
         if err?
           console.log err
           callback(err)
+          return
         if not interceptor?
           callback "No interceptor for id #{interId}"
+          return
 
+        console.log interceptor
         @interceptor = interceptor
 
         req.headers.host = @interceptor.host
