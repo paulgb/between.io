@@ -26,7 +26,6 @@ app.set 'client host', process.env.CLIENT_HOST
 app.set 'dailycred callback', "http://#{app.get('client host')}/auth"
 app.set 'views', __dirname + '/views'
 app.set 'view engine', 'jade'
-app.use express.favicon()
 app.use express.logger('dev')
 app.use express.bodyParser()
 app.use express.methodOverride()
