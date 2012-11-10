@@ -20,6 +20,9 @@ app.set 'intermediate cert', process.env.INTERMEDIATE_CERT
 app.set 'mongodb host', process.env.MONGODB_HOST || 'mongodb://localhost/between'
 app.set 'id bunch size', process.env.ID_BUNCH_SIZE || 10
 app.set 'id min allocated', process.env.ID_MIN_ALLOCATED || 5
+app.set 's3 key', process.env.S3_KEY
+app.set 's3 secret', process.env.S3_SECRET
+app.set 's3 bucket', process.env.S3_BUCKET
 app.set 'dailycred client id', process.env.DAILYCRED_CLIENT_ID
 app.set 'dailycred secret', process.env.DAILYCRED_SECRET
 app.set 'client host', process.env.CLIENT_HOST
