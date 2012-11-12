@@ -26,12 +26,14 @@ app.set 'client host', process.env.CLIENT_HOST
 app.set 'dailycred callback', "http://#{app.get('client host')}/auth"
 app.set 'views', __dirname + '/views'
 app.set 'view engine', 'jade'
+app.set 'cookie secret', process.env.COOKIE_SECRET || 'c374b67c4cd99a6ef1ccfcca2aeb93ff'
 app.use express.logger('dev')
 app.use express.bodyParser()
 app.use express.methodOverride()
-app.use express.cookieParser('c374b67c4cd99a6ef1ccfcca2aeb93ff')
+app.use express.cookieParser(app.get 'cookie secret')
 
-app.set 'session secret','0afe64dbf1ab51bf133843767797e523'
+app.set 'session secret', process.env.SESSION_SECRET || '0afe64dbf1ab51bf133843767797e523'
+
 sessionStore = new MongoStore
   url: app.get 'mongodb host'
 

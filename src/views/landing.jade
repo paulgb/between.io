@@ -1,7 +1,22 @@
 extends layout
 
 block content
-  h1 between.io
-  p between.io is currently in private beta. Contact 
-    a(href='mailto:paul@between.io') Paul 
-    | if you would like access.
+  h1(class='landing') Stop guessing what's on the wire
+  div(class='row')
+    div(class='span4')
+      p(class='subtext')
+        strong between.io 
+        | gives you insight into what your
+        | app is sending and receiving over HTTP and HTTPS.
+
+      div(class='box')
+        p
+          strong between.io 
+          | is currently in 
+          strong public beta.
+        a(href='/login', class='btn') Sign Up Now!
+        |  or  
+        a(href='https://github.com/paulgb/between.io', class='btn') Get the Code
+
+    div(class='span8 landing-image')
+      img(src='images/screenshot1.png')
