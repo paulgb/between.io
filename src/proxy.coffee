@@ -31,7 +31,15 @@ module.exports = (app) ->
   class BetweenProxy
     getTarget: (req, server, callback) =>
       req.headers = caseHeaders(req.headers)
-      interId = getInterceptorIdFromHost req.headers.Host
+
+      console.log req.headers.Host
+      console.log req.url
+      if /^proxy\./.exec(req.headers.Host)
+        console.log 'proxy request'
+        interId = 'proxy'
+      else
+        interId = getInterceptorIdFromHost req.headers.Host
+
       Interceptor.findById interId, (err, interceptor) =>
         if err?
           console.log err
@@ -40,16 +48,20 @@ module.exports = (app) ->
         if not interceptor?
           callback "No interceptor for id #{interId}"
           return
-
+        
         console.log interceptor
         @interceptor = interceptor
 
-        req.headers.host = @interceptor.host
-        host = @interceptor.host
-        if server.https
-          port = @interceptor.httpsPort
+        if interceptor.type == 'proxy'
+          console.log 'url:', req.url
+          host = req.headers.host
         else
-          port = @interceptor.httpPort
+          req.headers.host = @interceptor.host
+          host = @interceptor.host
+          if server.https
+            port = @interceptor.httpsPort
+          else
+            port = @interceptor.httpPort
         callback undefined, {host, port}
 
     onRequestWriteHead: (method, path, requestHeaders) =>

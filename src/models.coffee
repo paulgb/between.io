@@ -55,6 +55,9 @@ module.exports = (app) ->
 
   interceptorSchema = new Schema
     _id: String
+    type: {type: String, default: 'host'}
+    proxyUser: String
+    proxyPass: String
     host: String
     httpPort: Number
     httpsPort: Number
