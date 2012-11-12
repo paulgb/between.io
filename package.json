@@ -19,6 +19,7 @@
     "mongoose": "*",
     "passport": "*",
     "passport-dailycred": "*",
-    "connect-mongo": "*"
+    "connect-mongo": "*",
+    "passport.socketio": "*"
   }
 }

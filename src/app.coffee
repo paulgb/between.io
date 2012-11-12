@@ -104,17 +104,25 @@ module.exports = (app, socketio) ->
   socketio.sockets.on 'connection', (socket) ->
     socket.on 'subscribe', (transcriptId) ->
       console.log "got subscribe request for #{transcriptId}"
-      subscriptionManager.sub(transcriptId, socket.id, socket)
-
-      query = Exchange.find({interceptor: transcriptId})
-      query = query.limit(30).sort('-_id').exec (err, exchanges) ->
+      interceptor = Interceptor.findById transcriptId, (err, interceptor) ->
         if err
-          console.log "mongo error: #{err}"
+          socket.emit 'error', 'Interceptor not found'
           return
-          
-        if exchanges.length > 0
-          socket.emit 'transcript', exchanges.reverse()
+        if interceptor.user isnt socket.handshake.user.id
+          socket.emit 'error', 'Invalid user for this interceptor'
+          return
 
-      socket.on 'disconnect', ->
-        subscriptionManager.unsub(transcriptId, socket.id)
+        subscriptionManager.sub(transcriptId, socket.id, socket)
+
+        query = Exchange.find({interceptor: transcriptId})
+        query = query.limit(30).sort('-_id').exec (err, exchanges) ->
+          if err
+            console.log "mongo error: #{err}"
+            return
+            
+          if exchanges.length > 0
+            socket.emit 'transcript', exchanges.reverse()
+
+        socket.on 'disconnect', ->
+          subscriptionManager.unsub(transcriptId, socket.id)
 

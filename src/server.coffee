@@ -30,10 +30,15 @@ app.use express.logger('dev')
 app.use express.bodyParser()
 app.use express.methodOverride()
 app.use express.cookieParser('c374b67c4cd99a6ef1ccfcca2aeb93ff')
+
+app.set 'session secret','0afe64dbf1ab51bf133843767797e523'
+sessionStore = new MongoStore
+  url: app.get 'mongodb host'
+
 app.use express.session
-  secret: '0afe64dbf1ab51bf133843767797e523'
-  store: new MongoStore
-    url: app.get 'mongodb host'
+  secret: app.get 'session secret'
+  store: sessionStore
+
 app.use require('less-middleware')({ src: __dirname + '/public' })
 app.use require('browserify')(__dirname + '/public/js/client.coffee')
 
@@ -84,6 +89,13 @@ server.listen app.get('port'), ->
   
 socketio = require('socket.io').listen server
 socketio.set 'log level', 2
+
+passportSocket = require 'passport.socketio'
+socketio.set 'authorization', passportSocket.authorize
+  sessionKey: 'connect.sid'
+  sessionStore: sessionStore
+  sessionSecret: app.get 'session secret'
+
 
 require('./app')(app, socketio)
 

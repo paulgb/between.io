@@ -14,6 +14,9 @@ module.exports.listenTranscript = (transcriptId) ->
     console.log 'connected'
     socket.emit 'subscribe', transcriptId
 
+  socket.on 'error', (error) ->
+    console.log "Error: #{error}"
+
   socket.on 'transcript', (exchanges) ->
     console.log "got transcript, #{exchanges.length} exchanges"
     for exchange in exchanges
