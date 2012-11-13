@@ -1,25 +1,23 @@
 {
-  "name": "application-name",
+  "name": "between.io",
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "coffee server"
+    "start": "forever app.js"
   },
   "dependencies": {
     "express": "3.0.0rc5",
-    "jade": "*",
-    "less-middleware": "*",
-    "coffee-script": "*",
-    "http-proxy": "*",
-    "highlight.js": "*",
-    "filesize": "*",
-    "nodeunit": "*",
-    "socket.io": "*",
-    "browserify": "*",
-    "mongoose": "*",
-    "passport": "*",
-    "passport-dailycred": "*",
-    "connect-mongo": "*",
-    "passport.socketio": "*"
+    "jade": "0.27.x",
+    "less-middleware": "0.1.x",
+    "coffee-script": "1.4.x",
+    "http-proxy": "0.8.x",
+    "highlight.js": "7.3.x",
+    "socket.io": "0.9.x",
+    "passport.socketio": "0.0.x"
+    "browserify": "1.16.x",
+    "mongoose": "3.3.x",
+    "passport": "0.1.x",
+    "passport-dailycred": "0.1.x",
+    "connect-mongo": "0.2.x",
   }
 }
