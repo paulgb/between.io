@@ -61,7 +61,7 @@ module.exports = (app) ->
     user: String
 
   interceptorSchema.methods.getProxyHost = ->
-    "#{@_id}.#{app.get 'proxy host'}"
+    "#{@_id}.#{app.get 'proxy hostname'}"
 
   exchangePipeSchema = new Schema
     exchange: {type: String, ref: 'Exchange'}

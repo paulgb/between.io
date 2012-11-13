@@ -1,133 +1,85 @@
 
-fs = require 'fs'
+httpProxy = require 'http-proxy'
 
-{ProxyServer} = require('./proxyServer')
-{FileBuffer} = require './fileBuffer'
+exports.ProxyServer = class ProxyServer
+  # Class representing an HTTP proxy, instrumented with 
+  # hooks to capture and modify the request and response
+  # before they are forwarded. The constructor takes 
+  # a class as an argument that is constructed for each
+  # request and recieves the following callbacks:
+  #
+  #   getTarget(req)
+  #     given the request object, return an Object
+  #     with attributes {host, port, https} of the server
+  #     to target
+  #   onRequestWriteHead(method, path, headers)
+  #     called when the request headers are available
+  #   onRquestData(data)
+  #     called when a chunk of request data is sent
+  #   onRequestEnd()
+  #     called when the client is finished sending
+  #     the request
+  #   onResponseWriteHead(statusCode, headers)
+  #     called when the server has responded with
+  #     headers
+  #   onResponseWrite(data)
+  #     called when the server sends a chunk of data
+  #   onResponseEnd()
+  #     called when the server ends the connection
+  constructor: (cls, server) ->
+    handleRequest = (server) => (req, res, proxy) =>
+      exchange = new cls()
 
-getFilename = (path, def) ->
-  if result = /([^\/]+)$/.exec(path)
-    result[1]
-  else
-    def
+      requestDataBuffer = []
+      requestEnded = false
+      req.on 'data', (chunk) ->
+        requestDataBuffer.push(chunk)
+      req.on 'end', ->
+        requestEnded = true
 
-module.exports = (app) ->
-  {Interceptor, Exchange, File, idAllocator} = app.models
-  getInterceptorIdFromHost = (host) ->
-    hostbase = app.get 'proxy host'
-    hregex = new RegExp("([\\d\\w]+)\\.#{hostbase}")
-    result = hregex.exec(host)
-    if result
-      result[1]
-    else
-      console.log "no match for #{host}"
-
-  caseHeaders = (headers) ->
-    newHeaders = {}
-    for header, value of headers
-      header = header.replace /(^|-)\w/g, (a) -> a.toUpperCase()
-      newHeaders[header] = value
-    return newHeaders
-
-  class BetweenProxy
-    getTarget: (req, server, callback) =>
-      req.headers = caseHeaders(req.headers)
-      interId = getInterceptorIdFromHost req.headers.Host
-      Interceptor.findById interId, (err, interceptor) =>
-        if err?
-          console.log err
-          callback(err)
+      exchange.getTarget req, server, (err, target) =>
+        if err
+          console.log "Error: #{err}"
+          res.writeHead(404)
+          res.end()
           return
-        if not interceptor?
-          callback "No interceptor for id #{interId}"
-          return
 
-        console.log interceptor
-        @interceptor = interceptor
+        exchange.onRequestWriteHead? req.method, req.url, req.headers
 
-        req.headers.host = @interceptor.host
-        host = @interceptor.host
-        if server.https
-          port = @interceptor.httpsPort
-        else
-          port = @interceptor.httpPort
-        callback undefined, {host, port}
+        res._oldEnd = res.end
+        res.end = =>
+          exchange.onResponseEnd?()
+          res._oldEnd()
 
-    onRequestWriteHead: (method, path, requestHeaders) =>
-      host = @interceptor.host
-      requestHeaders = caseHeaders requestHeaders
-      @responseFilename = getFilename path, 'download'
-      @exchange = new Exchange
-        _id: idAllocator.take()
-        host: host
-        method: method
-        path: path
-        requestHeaders: requestHeaders
-        interceptor: @interceptor.id
-        user: @interceptor.user
+        res._oldWrite = res.write
+        res.write = (chunk) =>
+          exchange.onResponseWrite? chunk
+          res._oldWrite chunk
 
-      requestData = new File
-        _id: idAllocator.take()
-        contentEncoding: requestHeaders['Content-Encoding']
-        contentType: requestHeaders['Content-Type']
-        contentLength: requestHeaders['Content-Length']
-        fileName: 'postdata.txt'
-        user: @interceptor.user
+        res._oldWriteHead = res.writeHead
+        res.writeHead = (statusCode, headers) =>
+          exchange.onResponseWriteHead? statusCode, headers
+          res._oldWriteHead statusCode, headers
+        
+        req.on 'data', (chunk) ->
+          if exchange.onRequestWrite
+            exchange.onRequestWrite(chunk)
 
-      @exchange.requestData = requestData.id
-      @exchange.save()
+        req.on 'end', ->
+          if exchange.onRequestEnd
+            exchange.onRequestEnd()
 
-      file = new FileBuffer(requestHeaders['Content-Length'],
-        requestHeaders['Content-Encoding'])
+        proxy.proxyRequest req, res, target
 
-      file.on 'data', (data) =>
-        requestData.data = data
-        requestData.save()
+        for chunk of requestDataBuffer
+          req.emit 'data', chunk
 
-      @onRequestWrite = file.write
-      @onRequestEnd = file.end
-     
-    onResponseWriteHead: (statusCode, responseHeaders) =>
-      responseHeaders = caseHeaders responseHeaders
-      @exchange.responseStatus = statusCode
-      @exchange.responseHeaders = responseHeaders
+        if requestEnded
+          req.emit 'end'
 
-      responseData = new File
-        _id: idAllocator.take()
-        contentEncoding: responseHeaders['Content-Encoding']
-        contentType: responseHeaders['Content-Type']
-        contentLength: responseHeaders['Content-Length']
-        fileName: @responseFilename
-        user: @interceptor.user
 
-      @exchange.responseData = responseData.id
-      @exchange.save()
-
-      file = new FileBuffer(responseHeaders['Content-Length'],
-        responseHeaders['Content-Encoding'])
-
-      file.on 'data', (data) =>
-        responseData.data = data
-        responseData.save()
-
-      @onResponseWrite = file.write
-      @onResponseEnd = file.end
-
-  privateKey = fs.readFileSync(app.get('private key'), 'ascii')
-  cert = fs.readFileSync(app.get('certificate'), 'ascii')
-  if app.get('intermediate cert')
-    ic = [fs.readFileSync(app.get('intermediate cert'), 'ascii')]
-  else
-    ic = []
-  servers =
-    http:
-      port: app.get 'proxy port'
-    https:
-      port: app.get 'proxy https port'
-      target:
-        https: true
-      https:
-        key: privateKey
-        cert: cert
-        ca: ic
-  new ProxyServer(BetweenProxy, servers)
-
+    console.log "Starting proxy server"
+    proxy = httpProxy.createServer handleRequest(server), server
+    proxy.listen server.port, ->
+      console.log "Proxy listening on port #{server.port}"
+      
