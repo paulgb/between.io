@@ -75,7 +75,7 @@ module.exports.run = (serverClass) ->
 
   app.models = require('./models.coffee')(app)
 
-  if app.get 'tls'
+  if app.get('tls') == 'true'
     if app.get 'tls intermediate'
       ic = [fs.readFileSync(app.get('tls intermediate'), 'ascii')]
     else
