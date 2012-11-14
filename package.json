@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "start": "nf start",
-    "install-upstart": "nf export -a between -o /etc/init"
+    "install-upstart": "nf export -u between -a between -o /etc/init"
   },
   "dependencies": {
     "express": "3.0.0rc5",
