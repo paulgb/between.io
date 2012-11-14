@@ -1,4 +1,9 @@
 
+###
+models.coffee contains the model code used by both the web app
+and the proxy.
+###
+
 zlib = require 'zlib'
 http = require 'http'
 {EventEmitter} = require 'events'
@@ -10,11 +15,29 @@ mongoose = require 'mongoose'
 ALPHANUM_RADIX = 36
 
 module.exports = (app) ->
+  ###
+  The module exports a single function which, given the app,
+  returns an object with all the models. This way the
+  database configuration can be specified in the app object.
+  ###
+  
+  # Connect to database
   db = mongoose.connect app.get('mongodb host'), (err) ->
     if err?
       console.log "DB Error: #{err}"
     else
       console.log "DB Connection Opened"
+  
+  ###
+  between.io uses short alphanumeric IDs for most models. In
+  order to ensure they are unique, we use a model called
+  IdAllocatorMeta which stores the highest ID that has been
+  reserved. Rather than checking with the database before
+  assigning every single ID, each server process pre-allocates
+  a configuratble number of IDs on start up and whenever the
+  number pre-allocated dips below a certain number (due to
+  allocation).
+  ###
   
   idAllocatorMetaSchema = new Schema
     _id: String
@@ -42,7 +65,6 @@ module.exports = (app) ->
           start = allocatorMeta.maxAllocated
           end = allocatorMeta.maxAllocated + @bunchSize
           @allocated = @allocated.concat([start...end])
-          console.log "Allocated: #{@allocated}"
 
     take: =>
       if @allocated.length <= @minAllocated

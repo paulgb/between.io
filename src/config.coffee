@@ -1,5 +1,25 @@
 
+###
+Read configuration from environment variables into
+an express app (or similar interface, such as
+configStore.coffee).
+###
+
 configOptions = (service) ->
+  ###
+  Get a mapping of configuration
+  variable names to environment
+  variables, including metadata
+  on which are required for which
+  class of server, and default
+  values where applicable.
+
+  Takes an argument 'service'
+  as some mappings depend on the
+  service type.
+  ###
+
+  # Groups of server types for brevity
   ALL = [
     'CLIENT_HTTP'
     'CLIENT_HTTPS'
