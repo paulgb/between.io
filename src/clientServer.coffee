@@ -23,11 +23,7 @@ module.exports.run = (serverClass) ->
   require('./config').configFromEnv app, serverClass
 
   # App-level config
-  if app.get('tls') == 'true'
-    app.set 'protocol', 'https'
-  else
-    app.set 'protocol', 'http'
-  app.set 'dailycred callback', "#{app.get('protocol')}://"+
+  app.set 'dailycred callback', "https://"+
     "#{app.get('client hostname')}/auth"
   app.set 'views', __dirname + '/views'
   app.set 'view engine', 'jade'
