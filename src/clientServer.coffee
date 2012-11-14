@@ -71,6 +71,8 @@ module.exports.run = (serverClass) ->
   # Set user variable in locals for use in templates
   app.use (req, res, next) ->
     res.locals.user = req.user
+    res.locals.error = req.session.error
+    delete req.session.error
     next()
 
   app.use app.router

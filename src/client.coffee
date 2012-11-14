@@ -90,6 +90,14 @@ module.exports = (app, socketio) ->
       # sure a protocol is present
       iUrl = 'http://' + iUrl
     {protocol, port, hostname} = url.parse(iUrl)
+    if hostname == ''
+      req.session.error = "A valid URL, IP, or hostname must be supplied to create an inspector"
+      res.redirect '/'
+      return
+    if not /^([\w-]{0,63}\.)+[\w-]+$/.exec(hostname)
+      req.session.error = "The hostname given (#{hostname}) is not valid"
+      res.redirect '/'
+      return
     
     # The user can specify a port in the URL, but
     # only for the protocol given. Defaults for
